@@ -70,7 +70,8 @@ export function TokenForm({ connected, login, onChanged }: Props) {
       <p className="mb-3 text-[11.5px] leading-relaxed text-muted">
         Star Sorter needs a <strong className="font-semibold text-ink">classic</strong> personal
         access token with the <code className="rounded bg-surface px-1 py-0.5 text-[11px]">user</code>{" "}
-        scope. It is stored only in this browser and only sent to api.github.com.
+        scope. It is stored only in this browser and only sent to api.github.com. Choose
+        whether to keep it or delete it after each apply run in Settings.
       </p>
 
       {connected && !replacing && (

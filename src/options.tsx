@@ -15,6 +15,7 @@ import "./style.css"
 
 import { RulesEditor } from "./components/RulesEditor"
 import { TokenForm } from "./components/TokenForm"
+import { TokenStorageSetting } from "./components/TokenStorageSetting"
 import { clearAllData, getSession, SorterError } from "./lib/client"
 import { DEFAULT_RULES } from "./lib/defaults"
 import {
@@ -45,7 +46,7 @@ function SectionTitle({
 function OptionsPage() {
   const [session, setSession] = useState<Session | null>(null)
   const [rules, setRules] = useState<RuleSet>(DEFAULT_RULES)
-  const [settings, setSettings] = useState<Settings>({ includeSorted: false, theme: "auto" })
+  const [settings, setSettings] = useState<Settings>({ includeSorted: false, theme: "auto", tokenPolicy: "keep" })
   const [message, setMessage] = useState<{ kind: "success" | "error"; text: string } | null>(null)
   const [loaded, setLoaded] = useState(false)
 
@@ -91,7 +92,7 @@ function OptionsPage() {
       await clearAllData()
       await refreshSession()
       setRules(DEFAULT_RULES)
-      setSettings({ includeSorted: false, theme: "auto" })
+      setSettings({ includeSorted: false, theme: "auto", tokenPolicy: "keep" })
       setMessage({ kind: "success", text: "All Star Sorter data cleared." })
     } catch (error) {
       setMessage({
@@ -152,6 +153,14 @@ function OptionsPage() {
           </section>
 
           <section className="ss-card">
+            <SectionTitle icon={ShieldCheck}>Token storage</SectionTitle>
+            <TokenStorageSetting
+              value={settings.tokenPolicy}
+              onChange={(tokenPolicy) => void updateSettings({ tokenPolicy })}
+            />
+          </section>
+
+          <section className="ss-card">
             <SectionTitle icon={SlidersHorizontal}>Classification rules</SectionTitle>
             <RulesEditor rules={rules} repos={[]} onSaved={saveRules} />
           </section>
@@ -193,7 +202,8 @@ function OptionsPage() {
               </code>
               . The only network destination is{" "}
               <code className="rounded bg-surface2 px-1 py-0.5 text-[11px]">api.github.com</code>.
-              There is no backend, no analytics and no remote code.
+              There is no backend, no analytics and no remote code. If you choose to keep the
+              token, you are responsible for removing it when you are done.
             </p>
           </section>
 
@@ -214,7 +224,8 @@ function OptionsPage() {
         </div>
 
         <footer className="mt-6 text-center text-[11px] text-muted">
-          Star Sorter v1.0.0 · Built with Plasmo, React and TypeScript ·{" "}
+          Star Sorter v{chrome.runtime.getManifest().version} · Built with Plasmo, React and
+          TypeScript ·{" "}
           <a
             className="text-accent hover:underline"
             href="https://github.com/Muhammad-waqar-uit/star-sorter"

@@ -89,10 +89,14 @@ export type PlanSummary = {
   listsTouched: number
 }
 
+export type TokenPolicy = "keep" | "delete-after-run"
+
 export type Settings = {
   /** Show repos that already live in a list. */
   includeSorted: boolean
   theme: "auto" | "light" | "dark"
+  /** Keep the token until the user removes it, or delete it after an apply run. */
+  tokenPolicy: TokenPolicy
 }
 
 export type ApplyItem = {

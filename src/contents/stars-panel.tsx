@@ -93,7 +93,7 @@ export default function StarsPanel() {
   const githubTheme = useGithubTheme()
   const [open, setOpen] = useState(false)
   const [everOpened, setEverOpened] = useState(false)
-  const [settings, setSettings] = useState<Settings>({ includeSorted: false, theme: "auto" })
+  const [settings, setSettings] = useState<Settings>({ includeSorted: false, theme: "auto", tokenPolicy: "keep" })
 
   useEffect(() => {
     if (!open) return

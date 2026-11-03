@@ -40,7 +40,7 @@ error mapping, and a GitHub Actions workflow builds and publishes tagged release
 - [x] JSON rules editor with validation, live counts, import/export/reset
 - [x] Visual rule builder with drag reorder, add/rename/delete and chip inputs
 - [x] Live scan progress counter
-- [x] Token form with validation and removal
+- [x] Token form with validation, removal, and a keep/delete-after-run retention setting
 - [x] Popup with connection status, last scan, last run result and quick links
 - [x] Options page with preferences, privacy notes and danger zone
 - [x] Tailwind CSS design tokens, component layer and per-icon Lucide imports

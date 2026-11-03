@@ -93,7 +93,7 @@ export function Panel({ theme, onClose }: Props) {
   const [session, setSession] = useState<Session | null>(null)
   const [sessionLoaded, setSessionLoaded] = useState(false)
   const [rules, setRules] = useState<RuleSet>(DEFAULT_RULES)
-  const [settings, setSettings] = useState<Settings>({ includeSorted: false, theme: "auto" })
+  const [settings, setSettings] = useState<Settings>({ includeSorted: false, theme: "auto", tokenPolicy: "keep" })
   const [stars, setStars] = useState<StarredRepo[] | null>(null)
   const [lists, setLists] = useState<GitHubList[]>([])
   const [overrides, setOverrides] = useState<Record<string, string | null>>({})
@@ -398,6 +398,28 @@ export function Panel({ theme, onClose }: Props) {
           </div>
         ) : !connected ? (
           <div className="space-y-2">
+            {session?.lastRun && (
+              <div
+                className={`ss-alert ${
+                  session.lastRun.failed > 0 ? "ss-alert-warn" : "ss-alert-success"
+                } flex items-start gap-2`}>
+                {session.lastRun.failed > 0 ? (
+                  <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                ) : (
+                  <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                )}
+                <div className="min-w-0">
+                  <strong className="block text-[12px]">Last run</strong>
+                  <span>
+                    {session.lastRun.message ||
+                      `${session.lastRun.completed} of ${session.lastRun.total} processed.`}
+                  </span>
+                  <span className="mt-0.5 block text-[10.5px] text-muted">
+                    No token is stored in this browser.
+                  </span>
+                </div>
+              </div>
+            )}
             <TokenForm
               connected={false}
               onChanged={async () => {

@@ -8,8 +8,11 @@ import {
 import { buildUndoLog } from "../lib/history"
 import { desiredListIds, findListByName, normalizeListName } from "../lib/plan"
 import {
+  clearAccount,
+  clearToken,
   getRules,
   getRunState,
+  getSettings,
   getToken,
   setRunState,
   setUndoLog
@@ -273,6 +276,20 @@ async function finish(
     finishedAt: Date.now(),
     message
   }
+
+  // Apply the user's retention choice for every terminal state, including
+  // cancelled and failed runs, before publishing the finished state so a
+  // progress poll cannot observe a stale connected session.
+  try {
+    const settings = await getSettings()
+    if (settings.tokenPolicy === "delete-after-run") {
+      await clearToken()
+      await clearAccount()
+    }
+  } catch (error) {
+    console.error("[Star Sorter] could not apply the token retention policy", error)
+  }
+
   await setRunState(finished)
   return finished
 }

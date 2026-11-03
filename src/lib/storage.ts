@@ -31,7 +31,8 @@ export const KEYS = {
 
 export const DEFAULT_SETTINGS: Settings = {
   includeSorted: false,
-  theme: "auto"
+  theme: "auto",
+  tokenPolicy: "keep"
 }
 
 export function cloneRules(rules: RuleSet): RuleSet {

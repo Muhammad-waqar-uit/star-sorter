@@ -9,7 +9,8 @@ no analytics and no third-party requests.
 
 All data stays in your browser's `chrome.storage.local`:
 
-- **GitHub token** — a classic personal access token you create and paste yourself.
+- **GitHub token** — a classic personal access token you create and paste yourself. You can
+  choose to keep it until you remove it, or have it deleted automatically after each apply run.
 - **Rules and settings** — your classification rules, theme and preview preference.
 - **Account** — your GitHub login, used to show connection status.
 - **Last scan summary** — time, star count and list count.
@@ -38,6 +39,11 @@ identifiers or usage data. No remote code is loaded.
 ## Control and removal
 
 - Remove the token at any time from the panel or Options.
+- Choose **Keep until I remove it** (default) or **Delete after each apply run** in Settings.
+  Automatic deletion happens when a run finishes, including cancelled or failed runs, and also
+  clears the cached account. You must paste the token again for the next run or an undo.
+- If you keep the token, you are responsible for removing it when you are done. Use a token with
+  the smallest scope that works (`user`) and revoke it on GitHub if you stop using the extension.
 - **Clear all extension data** in Options removes the token, rules, settings and history.
 - Uninstalling the extension removes its local storage.
 

@@ -87,10 +87,10 @@ Everything is `chrome.storage.local`:
 
 | Key | Shape | Notes |
 | --- | --- | --- |
-| `token` | `string` | Read only by the background worker. Never returned by `session`. |
+| `token` | `string` | Read only by the background worker. Never returned by `session`. Removed when `settings.tokenPolicy` is `delete-after-run` and an apply run finishes. |
 | `account` | `{ login, name?, avatarUrl? }` | Cached viewer identity. |
 | `rules` | `RuleSet` | Validated on read; invalid data falls back to the bundled defaults. |
-| `settings` | `{ includeSorted, theme }` | Theme is `auto` (follow GitHub) / `light` / `dark`. |
+| `settings` | `{ includeSorted, theme, tokenPolicy }` | Theme is `auto` (follow GitHub) / `light` / `dark`; `tokenPolicy` is `keep` or `delete-after-run`. |
 | `lastScan` | `{ at, starCount, listCount, login }` | Popup summary only; star data is never persisted. |
 | `undoLog` | `{ at, previous, createdListIds, names }` | Single most recent run. |
 | `runState` | `RunState` | Progress and failures, also used for reconnect. |
@@ -111,6 +111,8 @@ Everything is `chrome.storage.local`:
 - The content script runs in page context but never receives the token. It asks the worker for
   connection state and operations.
 - The token is never logged, never placed in a URL, never stored in `chrome.storage.sync`.
+- With `delete-after-run`, the worker clears the token and cached account in `finish()` before
+  publishing the terminal run state, so the UI cannot observe a connected session afterwards.
 - Repo descriptions and list names are untrusted text: rendered as React text nodes only.
 - Panel styles are injected into a shadow root, so GitHub's CSS and ours cannot collide.
 - The extension requests only `storage` and `https://api.github.com/*`.

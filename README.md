@@ -50,7 +50,7 @@ Releases are published automatically by the [Release workflow](.github/workflows
 | | |
 | --- | --- |
 | **Stars page panel** | Floating _Sort stars_ button, only on `?tab=stars` / `/stars`, inside a shadow DOM so GitHub's CSS is untouched. |
-| **Token management** | Classic token with the `user` scope, validated against `viewer` before it is saved; remove or replace it any time. |
+| **Token management** | Classic token with the `user` scope, validated against `viewer` before it is saved; remove or replace it any time. Choose to keep it (you manage removal) or delete it automatically after each apply run. |
 | **Full scan** | Every starred repo (id, name, description, language, topics, stars, updated date, archived flag) plus every list and its members, 100 per page. |
 | **Editable rules** | Visual builder (add, rename, drag-reorder, delete, chip inputs) plus a JSON editor with validation, live per-list match counts, import, export and reset. Bundled defaults for 12 common categories. |
 | **Reviewable plan** | Grouped, searchable, virtualized table with per-repo overrides, bulk assignment, skip, live scan progress and a running count of the moves that will happen. |
@@ -151,7 +151,7 @@ docs/                        architecture, features, limitations, plan, progress
 ## Security & privacy
 
 - Only the `storage` permission and the `api.github.com` host permission are requested.
-- The token is stored in `chrome.storage.local`, read only by the background worker, never logged and never placed in a URL.
+- The token is stored in `chrome.storage.local`, read only by the background worker, never logged and never placed in a URL. Enable **Delete after each apply run** if you do not want it retained between tasks.
 - Repository descriptions are rendered as React text nodes — never `dangerouslySetInnerHTML`.
 - No analytics, no remote code, no third-party requests. See [Privacy](docs/PRIVACY.md) and [Security](SECURITY.md).
 

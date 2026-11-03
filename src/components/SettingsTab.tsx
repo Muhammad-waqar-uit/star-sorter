@@ -4,6 +4,7 @@ import { useState } from "react"
 import { clearAllData, SorterError } from "../lib/client"
 import type { Session, Settings } from "../lib/types"
 import { TokenForm } from "./TokenForm"
+import { TokenStorageSetting } from "./TokenStorageSetting"
 
 type Props = {
   session: Session | null
@@ -79,6 +80,14 @@ export function SettingsTab({ session, settings, onSettings, onChanged }: Props)
       </section>
 
       <section>
+        <SectionTitle icon={ShieldCheck}>Token storage</SectionTitle>
+        <TokenStorageSetting
+          value={settings.tokenPolicy}
+          onChange={(tokenPolicy) => void update({ tokenPolicy })}
+        />
+      </section>
+
+      <section>
         <SectionTitle icon={SlidersHorizontal}>Defaults</SectionTitle>
         <label className="ss-check">
           <input
@@ -114,7 +123,8 @@ export function SettingsTab({ session, settings, onSettings, onChanged }: Props)
       <p className="flex items-start gap-1.5 text-[11px] leading-relaxed text-muted">
         <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
         Star Sorter keeps the token, rules and undo log in chrome.storage.local. No analytics, no
-        backend, no requests outside api.github.com.
+        backend, no requests outside api.github.com. If you keep the token, you are responsible
+        for removing it when you are done.
       </p>
     </div>
   )

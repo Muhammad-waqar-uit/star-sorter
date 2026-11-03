@@ -17,6 +17,9 @@ Status legend: **Shipped** · **Partial** · **Planned**
 - Password field for a **classic** token with the `user` scope.
 - Validated with `viewer { login }` before saving; the panel shows the resolved username.
 - Stored in `chrome.storage.local`, read only by the background worker.
+- Retention choice: **keep until removed** (default, user manages it) or **delete after each
+  apply run** (removes the token and cached account when a run finishes, including cancelled or
+  failed runs). An undo or the next run needs the token again.
 - Replace and remove token actions, with a direct link to the pre-scoped token form.
 - Errors are mapped to readable messages: invalid/expired token, missing scope, rate limit,
   network.

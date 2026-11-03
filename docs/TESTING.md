@@ -45,6 +45,12 @@ Use a throwaway GitHub account with ~50 stars before running on a large collecti
 - [ ] Paste a valid classic token → `Connected as <login>`.
 - [ ] Remove the token → panel returns to the token form; popup shows not connected.
 - [ ] Replace the token → new login is shown.
+- [ ] Set **Delete after each apply run**, complete an apply → token and cached account are
+      removed, the panel shows the last run summary with the token form, and the popup shows
+      not connected.
+- [ ] With automatic deletion on, a cancelled or failed apply also removes the token.
+- [ ] With **Keep until I remove it**, the token survives an apply and undo works without
+      re-entering it.
 
 ### Scan
 

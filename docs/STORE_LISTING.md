@@ -30,7 +30,8 @@ Highlights:
 - Light and dark themes that follow GitHub.
 
 Privacy: local only. Your token is stored in your browser and only sent to api.github.com.
-No analytics, no backend, no third-party requests.
+You can keep it or have it deleted automatically after each apply run. No analytics, no backend,
+no third-party requests.
 
 Requires a classic GitHub personal access token with the `user` scope. Star Sorter is not
 affiliated with GitHub.
@@ -43,7 +44,7 @@ Developer tools / Productivity
 
 | Permission | Why it is needed |
 | --- | --- |
-| `storage` | Saves the GitHub token, your rules, preferences, the undo log and run progress locally. |
+| `storage` | Saves the GitHub token (optionally deleted after each apply run), rules, preferences, the undo log and run progress locally. |
 | `https://api.github.com/*` | Reads your starred repositories and lists and applies the list changes you approve. |
 
 No `tabs`, `history`, `scripting` or broad host permissions are requested. The content script

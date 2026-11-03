@@ -55,4 +55,6 @@ Known gaps in v1.0, in rough order of importance.
 
 - The token is stored unencrypted in `chrome.storage.local`, like every browser extension
   secret. Anyone with access to your browser profile or devtools can read it. Use a token with
-  the smallest scope that works (`user`) and revoke it when you stop using the extension.
+  the smallest scope that works (`user`), enable **Delete after each apply run**, and revoke it
+  on GitHub when you stop using the extension. Automatic deletion applies only to apply runs;
+  scans, list edits and undo do not remove the token.
