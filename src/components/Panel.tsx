@@ -1,6 +1,22 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
-
 import logoUrl from "data-base64:../../assets/brand/icons/icon-48.png"
+import {
+  AlertCircle,
+  AlertTriangle,
+  CheckCircle2,
+  FolderOpen,
+  Info,
+  ListFilter,
+  Loader2,
+  Play,
+  RefreshCw,
+  RotateCw,
+  Settings as SettingsIcon,
+  SlidersHorizontal,
+  Sparkles,
+  Undo2,
+  X
+} from "./icons"
+import { useCallback, useEffect, useMemo, useState } from "react"
 
 import {
   applyPlan,
@@ -49,6 +65,27 @@ type Notice = {
   kind: "info" | "error" | "success" | "warn"
   text: string
   fixToken?: boolean
+}
+
+const tabs: { key: Tab; label: string; icon: typeof ListFilter }[] = [
+  { key: "sort", label: "Sort", icon: ListFilter },
+  { key: "lists", label: "Lists", icon: FolderOpen },
+  { key: "rules", label: "Rules", icon: SlidersHorizontal },
+  { key: "settings", label: "Settings", icon: SettingsIcon }
+]
+
+const noticeStyles: Record<Notice["kind"], string> = {
+  info: "",
+  error: "ss-alert-error",
+  success: "ss-alert-success",
+  warn: "ss-alert-warn"
+}
+
+const noticeIcons: Record<Notice["kind"], typeof Info> = {
+  info: Info,
+  error: AlertCircle,
+  success: CheckCircle2,
+  warn: AlertTriangle
 }
 
 export function Panel({ theme, onClose }: Props) {
@@ -289,104 +326,150 @@ export function Panel({ theme, onClose }: Props) {
   const running = run?.status === "running"
   const failedIds = new Set(run?.failed.map((failure) => failure.repoId) ?? [])
   const retryItems = applyItems.filter((item) => failedIds.has(item.repoId))
+  const NoticeIcon = notice ? noticeIcons[notice.kind] : Info
 
   return (
-    <div className={`ss-panel ss-theme-${theme}`} role="dialog" aria-label="Star Sorter">
-      <header className="ss-header">
-        <span className="ss-brand">
-          <img src={logoUrl} alt="" />
-          Star Sorter
+    <div
+      className={`ss-panel ${theme === "dark" ? "ss-theme-dark" : "ss-theme-light"}`}
+      role="dialog"
+      aria-label="Star Sorter">
+      <header className="ss-panel-header">
+        <span className="flex min-w-0 items-center gap-2">
+          <img
+            src={logoUrl}
+            alt=""
+            className="h-7 w-7 shrink-0 rounded-lg ring-1 ring-line"
+          />
+          <span className="flex min-w-0 flex-col leading-tight">
+            <span className="truncate text-[13px] font-bold tracking-tight">Star Sorter</span>
+            <span className="truncate text-[9.5px] uppercase tracking-[0.16em] text-muted">
+              GitHub stars
+            </span>
+          </span>
         </span>
-        <span className="ss-status" title={session?.account?.login}>
-          <i className={`ss-dot ${connected ? "on" : ""}`} />
-          {running
-            ? "Run in progress…"
-            : connected
-              ? `Connected as ${session?.account?.login ?? "you"}`
-              : "Not connected"}
+
+        <span className="ml-auto flex min-w-0 items-center gap-1.5 text-[11px] text-muted">
+          <span
+            className={`h-1.5 w-1.5 shrink-0 rounded-full ${
+              connected ? "bg-success" : "bg-muted/60"
+            }`}
+          />
+          <span className="truncate">
+            {running
+              ? "Run in progress…"
+              : connected
+                ? `@${session?.account?.login ?? "connected"}`
+                : "Not connected"}
+          </span>
         </span>
-        <button className="ss-icon-btn" type="button" aria-label="Close panel" onClick={onClose}>
-          ×
+
+        <button
+          className="ss-btn ss-btn-icon ss-btn-ghost shrink-0"
+          type="button"
+          aria-label="Close panel"
+          title="Close"
+          onClick={onClose}>
+          <X className="h-4 w-4" aria-hidden="true" />
         </button>
       </header>
 
       {connected && (
-        <nav className="ss-tabs" aria-label="Sections">
-          {(
-            [
-              ["sort", "Sort"],
-              ["lists", "Lists"],
-              ["rules", "Rules"],
-              ["settings", "Settings"]
-            ] as [Tab, string][]
-          ).map(([key, label]) => (
+        <nav className="flex gap-0.5 border-b border-line px-2" aria-label="Sections">
+          {tabs.map(({ key, label, icon: Icon }) => (
             <button
               key={key}
               type="button"
-              className={`ss-tab ${tab === key ? "active" : ""}`}
+              className="ss-tab"
+              data-active={tab === key ? "true" : "false"}
               aria-current={tab === key ? "page" : undefined}
               onClick={() => setTab(key)}>
+              <Icon className="h-3.5 w-3.5" aria-hidden="true" />
               {label}
             </button>
           ))}
         </nav>
       )}
 
-      <div className="ss-body">
+      <div className="ss-panel-body space-y-3">
         {!sessionLoaded ? (
-          <div className="ss-empty">Loading…</div>
+          <div className="flex items-center justify-center gap-2 py-10 text-[12px] text-muted">
+            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+            Loading…
+          </div>
         ) : !connected ? (
-          <TokenForm
-            connected={false}
-            onChanged={async () => {
-              await refreshSession()
-              setNotice(null)
-            }}
-          />
+          <div className="space-y-2">
+            <TokenForm
+              connected={false}
+              onChanged={async () => {
+                await refreshSession()
+                setNotice(null)
+              }}
+            />
+            <p className="px-1 text-[11px] leading-relaxed text-muted">
+              Star Sorter reads your stars only after you scan, and nothing is changed on GitHub
+              until you press Apply.
+            </p>
+          </div>
         ) : tab === "sort" ? (
           <>
             {notice && (
-              <div className={`ss-alert ${notice.kind}`}>
-                {busy === "scan" ? (scanNote ?? notice.text) : notice.text}
-                {notice.fixToken && (
-                  <div className="ss-row" style={{ marginTop: 6, marginBottom: 0 }}>
-                    <button className="ss-btn" type="button" onClick={() => setTab("settings")}>
-                      Fix token
-                    </button>
-                  </div>
-                )}
+              <div className={`ss-alert ${noticeStyles[notice.kind]} flex items-start gap-2`}>
+                <NoticeIcon className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                <div className="min-w-0">
+                  {busy === "scan" ? (scanNote ?? notice.text) : notice.text}
+                  {notice.fixToken && (
+                    <div className="mt-1">
+                      <button className="ss-btn ss-btn-sm" type="button" onClick={() => setTab("settings")}>
+                        Fix token
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
             {!stars ? (
-              <div className="ss-empty">
-                <strong>Scan your stars</strong>
-                Star Sorter reads every starred repo and your existing lists, then proposes a list
-                for each repo. Nothing changes until you press Apply.
-                <div className="ss-actions" style={{ justifyContent: "center" }}>
-                  <button
-                    className="ss-btn primary"
-                    type="button"
-                    onClick={() => void handleScan()}
-                    disabled={busy !== null}>
-                    {busy === "scan" ? "Scanning…" : "Scan and preview"}
-                  </button>
-                </div>
+              <div className="rounded-xl border border-dashed border-line bg-surface2/40 px-5 py-8 text-center">
+                <span className="mx-auto mb-2.5 grid h-10 w-10 place-items-center rounded-2xl bg-accent-soft text-accent">
+                  <Sparkles className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <strong className="block text-[13px] font-bold text-ink">Scan your stars</strong>
+                <p className="mx-auto mt-1 max-w-[340px] text-[11.5px] leading-relaxed text-muted">
+                  Star Sorter reads every starred repo and your existing lists, then proposes a
+                  list for each repo. Nothing changes until you press Apply.
+                </p>
+                <button
+                  className="ss-btn ss-btn-primary mt-3"
+                  type="button"
+                  onClick={() => void handleScan()}
+                  disabled={busy !== null}>
+                  {busy === "scan" ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                  ) : (
+                    <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+                  )}
+                  {busy === "scan" ? "Scanning…" : "Scan and preview"}
+                </button>
               </div>
             ) : (
               <>
-                <div className="ss-row">
-                  <span className="ss-hint">
-                    {stars.length} stars · {lists.length} lists ·{" "}
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[11px] text-muted">
+                    <span className="font-semibold text-ink">{stars.length}</span> stars ·{" "}
+                    <span className="font-semibold text-ink">{lists.length}</span> lists ·{" "}
                     {new Date(session?.lastScan?.at ?? Date.now()).toLocaleString()}
                   </span>
                   <button
-                    className="ss-btn"
+                    className="ss-btn ss-btn-sm ml-auto"
                     type="button"
-                    style={{ marginLeft: "auto" }}
                     onClick={() => void handleScan()}
                     disabled={busy !== null || running}>
-                    {busy === "scan" ? "Scanning…" : "Rescan"}
+                    {busy === "scan" ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                    ) : (
+                      <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
+                    )}
+                    Rescan
                   </button>
                 </div>
 
@@ -396,7 +479,9 @@ export function Panel({ theme, onClose }: Props) {
                   listNames={ruleListNames(rules)}
                   includeSorted={settings.includeSorted}
                   summary={summary}
-                  onIncludeSorted={(value) => void handleSettings({ ...settings, includeSorted: value })}
+                  onIncludeSorted={(value) =>
+                    void handleSettings({ ...settings, includeSorted: value })
+                  }
                   onSetTarget={(repoId, target) =>
                     setOverrides((current) => ({ ...current, [repoId]: target }))
                   }
@@ -426,42 +511,58 @@ export function Panel({ theme, onClose }: Props) {
       </div>
 
       {connected && tab === "sort" && (
-        <footer className="ss-footer">
+        <footer className="ss-panel-footer">
           {run && <ProgressBar run={run} onCancel={() => void handleCancel()} />}
 
-          <div className="ss-row" style={{ marginBottom: 0 }}>
-            <span className="ss-hint">{summary.moves} move(s) ready</span>
-            <button
-              className="ss-btn primary"
-              type="button"
-              style={{ marginLeft: "auto" }}
-              onClick={() => void handleApply()}
-              disabled={busy !== null || running || summary.moves === 0}>
-              Apply {summary.moves} move{summary.moves === 1 ? "" : "s"}
-            </button>
-            <button
-              className="ss-btn"
-              type="button"
-              onClick={() => void handleUndo()}
-              disabled={busy !== null || running || !session?.undoAvailable}>
-              Undo last run
-            </button>
-            {!running && retryItems.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-[11px] tabular-nums text-muted">
+              <span className="font-semibold text-ink">{summary.moves}</span> move
+              {summary.moves === 1 ? "" : "s"} ready
+            </span>
+
+            <div className="ml-auto flex flex-wrap items-center gap-1.5">
+              <button
+                className="ss-btn ss-btn-primary"
+                type="button"
+                onClick={() => void handleApply()}
+                disabled={busy !== null || running || summary.moves === 0}>
+                {running ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                ) : (
+                  <Play className="h-3.5 w-3.5" aria-hidden="true" />
+                )}
+                Apply {summary.moves} move{summary.moves === 1 ? "" : "s"}
+              </button>
+
               <button
                 className="ss-btn"
                 type="button"
-                disabled={busy !== null}
-                onClick={() => void handleApply(retryItems)}>
-                Retry failed ({retryItems.length})
+                title="Undo the last run"
+                onClick={() => void handleUndo()}
+                disabled={busy !== null || running || !session?.undoAvailable}>
+                <Undo2 className="h-3.5 w-3.5" aria-hidden="true" />
+                Undo
               </button>
-            )}
-            {run?.status === "done" && (
-              <button className="ss-btn" type="button" onClick={() => window.location.reload()}>
-                Refresh page
-              </button>
-            )}
-          </div>
 
+              {!running && retryItems.length > 0 && (
+                <button
+                  className="ss-btn"
+                  type="button"
+                  disabled={busy !== null}
+                  onClick={() => void handleApply(retryItems)}>
+                  <RotateCw className="h-3.5 w-3.5" aria-hidden="true" />
+                  Retry failed ({retryItems.length})
+                </button>
+              )}
+
+              {run?.status === "done" && (
+                <button className="ss-btn" type="button" onClick={() => window.location.reload()}>
+                  <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
+                  Refresh
+                </button>
+              )}
+            </div>
+          </div>
         </footer>
       )}
     </div>

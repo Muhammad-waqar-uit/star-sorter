@@ -1,4 +1,5 @@
 import logoUrl from "data-base64:../assets/brand/icons/icon-128.png"
+import { ExternalLink, Settings, Star, Undo2 } from "./components/icons"
 import { useEffect, useState } from "react"
 
 import "./style.css"
@@ -20,55 +21,85 @@ function Popup() {
 
   return (
     <div className="ss-page ss-popup">
-      <header className="ss-page-head">
-        <img src={logoUrl} alt="Star Sorter" />
-        <div>
-          <h1>Star Sorter</h1>
-          <p>{session?.connected ? `Connected as ${login}` : "Not connected"}</p>
+      <header className="flex items-center gap-2.5 border-b border-line px-4 py-3">
+        <img
+          src={logoUrl}
+          alt=""
+          className="h-9 w-9 rounded-xl ring-1 ring-line"
+        />
+        <div className="min-w-0">
+          <h1 className="truncate text-[14px] font-bold tracking-tight text-ink">Star Sorter</h1>
+          <p className="truncate text-[11px] text-muted">
+            {session?.connected ? `@${login}` : "Not connected"}
+          </p>
         </div>
+        <span
+          className={`ml-auto h-2 w-2 shrink-0 rounded-full ${
+            session?.connected ? "bg-success" : "bg-muted/50"
+          }`}
+          aria-hidden="true"
+        />
       </header>
 
-      <div className="ss-card">
-        <div className="ss-kv">
-          <span>Stars scanned</span>
-          <span>{lastScan ? lastScan.starCount : "—"}</span>
-        </div>
-        <div className="ss-kv">
-          <span>Lists</span>
-          <span>{lastScan ? lastScan.listCount : "—"}</span>
-        </div>
-        <div className="ss-kv">
-          <span>Last scan</span>
-          <span>{lastScan ? new Date(lastScan.at).toLocaleString() : "Never"}</span>
-        </div>
-        <div className="ss-kv">
-          <span>Undo available</span>
-          <span>{session?.undoAvailable ? "Yes" : "No"}</span>
+      <div className="p-3">
+        <div className="rounded-xl border border-line bg-surface2/60 p-3">
+          <div className="ss-kv">
+            <span>Stars scanned</span>
+            <span className="tabular-nums">{lastScan ? lastScan.starCount : "—"}</span>
+          </div>
+          <div className="ss-kv">
+            <span>Lists</span>
+            <span className="tabular-nums">{lastScan ? lastScan.listCount : "—"}</span>
+          </div>
+          <div className="ss-kv">
+            <span>Last scan</span>
+            <span className="truncate text-[11px]">
+              {lastScan ? new Date(lastScan.at).toLocaleString() : "Never"}
+            </span>
+          </div>
+          <div className="ss-kv">
+            <span className="flex items-center gap-1.5">
+              <Undo2 className="h-3 w-3" aria-hidden="true" />
+              Undo available
+            </span>
+            <span>{session?.undoAvailable ? "Yes" : "No"}</span>
+          </div>
         </div>
 
-        <div className="ss-actions">
+        <div className="mt-2.5 flex flex-col gap-1.5">
           <button
-            className="ss-btn primary"
+            className="ss-btn ss-btn-primary w-full"
             type="button"
             disabled={!login}
             onClick={() =>
               login && chrome.tabs.create({ url: `https://github.com/${login}?tab=stars` })
             }>
+            <Star className="h-3.5 w-3.5" aria-hidden="true" />
             Open my Stars
           </button>
           <button
-            className="ss-btn"
+            className="ss-btn w-full"
             type="button"
             onClick={() => chrome.runtime.openOptionsPage()}>
+            <Settings className="h-3.5 w-3.5" aria-hidden="true" />
             Options
           </button>
         </div>
 
-        {!session?.connected && (
-          <p className="ss-muted" style={{ marginBottom: 0 }}>
-            Add a classic personal access token with the <code>user</code> scope in Options to
-            start sorting.
+        {!session?.connected ? (
+          <p className="mt-2.5 text-[11px] leading-relaxed text-muted">
+            Add a classic token with the <code className="text-[10.5px]">user</code> scope in
+            Options to start sorting.
           </p>
+        ) : (
+          <a
+            className="mt-2.5 inline-flex items-center gap-1 text-[11px] font-medium text-accent hover:underline"
+            href={`https://github.com/${login}?tab=stars`}
+            target="_blank"
+            rel="noreferrer">
+            Stars page
+            <ExternalLink className="h-3 w-3" aria-hidden="true" />
+          </a>
         )}
       </div>
     </div>

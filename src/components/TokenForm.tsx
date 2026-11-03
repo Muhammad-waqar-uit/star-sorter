@@ -1,3 +1,4 @@
+import { CheckCircle2, ExternalLink, KeyRound, Loader2, Trash2 } from "./icons"
 import { useState } from "react"
 
 import { removeToken, saveToken, SorterError } from "../lib/client"
@@ -52,31 +53,51 @@ export function TokenForm({ connected, login, onChanged }: Props) {
   }
 
   return (
-    <div>
-      <h3>GitHub token</h3>
-      <p className="ss-hint">
-        Star Sorter needs a <strong>classic</strong> personal access token with the{" "}
-        <code>user</code> scope. It is stored only in this browser and only sent to
-        api.github.com.
+    <section className="rounded-xl border border-line bg-surface2/60 p-3.5">
+      <div className="mb-1.5 flex items-center gap-2">
+        <span className="grid h-7 w-7 place-items-center rounded-lg bg-accent-soft text-accent">
+          <KeyRound className="h-3.5 w-3.5" aria-hidden="true" />
+        </span>
+        <h3 className="text-[13px] font-bold text-ink">GitHub token</h3>
+        {connected && (
+          <span className="ss-badge-success ss-badge ml-auto">
+            <CheckCircle2 className="h-3 w-3" aria-hidden="true" />
+            Connected
+          </span>
+        )}
+      </div>
+
+      <p className="mb-3 text-[11.5px] leading-relaxed text-muted">
+        Star Sorter needs a <strong className="font-semibold text-ink">classic</strong> personal
+        access token with the <code className="rounded bg-surface px-1 py-0.5 text-[11px]">user</code>{" "}
+        scope. It is stored only in this browser and only sent to api.github.com.
       </p>
 
       {connected && !replacing && (
-        <div className="ss-row">
-          <span className="ss-badge">Connected as {login ?? "your account"}</span>
-          <button className="ss-btn" type="button" onClick={() => setReplacing(true)}>
-            Use a different token
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="ss-badge">
+            <span className="h-1.5 w-1.5 rounded-full bg-success" />
+            {login ?? "your account"}
+          </span>
+          <button className="ss-btn ss-btn-sm" type="button" onClick={() => setReplacing(true)}>
+            Replace token
           </button>
-          <button className="ss-btn danger" type="button" onClick={handleRemove} disabled={busy}>
-            Remove token
+          <button
+            className="ss-btn ss-btn-sm ss-btn-danger"
+            type="button"
+            onClick={handleRemove}
+            disabled={busy}>
+            <Trash2 className="h-3 w-3" aria-hidden="true" />
+            Remove
           </button>
         </div>
       )}
 
       {showForm && (
         <>
-          <div className="ss-row">
+          <div className="flex items-center gap-2">
             <input
-              className="ss-grow"
+              className="ss-input flex-1 font-mono"
               type="password"
               value={token}
               autoComplete="off"
@@ -88,15 +109,18 @@ export function TokenForm({ connected, login, onChanged }: Props) {
               }}
             />
             <button
-              className="ss-btn primary"
+              className="ss-btn ss-btn-primary shrink-0"
               type="button"
               onClick={handleSave}
               disabled={busy || !token.trim()}>
+              {busy ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+              ) : null}
               {busy ? "Checking…" : "Save token"}
             </button>
             {replacing && (
               <button
-                className="ss-btn"
+                className="ss-btn ss-btn-sm shrink-0"
                 type="button"
                 onClick={() => {
                   setReplacing(false)
@@ -107,13 +131,18 @@ export function TokenForm({ connected, login, onChanged }: Props) {
               </button>
             )}
           </div>
-          <a href={TOKEN_URL} target="_blank" rel="noreferrer" className="ss-hint">
-            Create a token with the right scope →
+          <a
+            href={TOKEN_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-2 inline-flex items-center gap-1 text-[11.5px] font-medium text-accent hover:underline">
+            Create a token with the right scope
+            <ExternalLink className="h-3 w-3" aria-hidden="true" />
           </a>
         </>
       )}
 
-      {error && <div className="ss-alert error">{error}</div>}
-    </div>
+      {error && <div className="ss-alert ss-alert-error mt-2">{error}</div>}
+    </section>
   )
 }

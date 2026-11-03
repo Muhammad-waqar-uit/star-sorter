@@ -1,0 +1,140 @@
+name: Release
+
+# Every push to main builds the extension, bumps the version, tags it and
+# publishes a GitHub Release with ready-to-load Chrome and Firefox zips.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Version bump for the next release
+        type: choice
+        options: [patch, minor, major]
+        default: patch
+
+permissions:
+  contents: write
+
+# Never run two releases at the same time; a queued run sees the new tag.
+concurrency:
+  group: release-main
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build and publish release
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, '[skip release]') }}
+
+    steps:
+      - name: Check out the full history (tags are needed for versioning)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.16.1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Unit tests
+        run: pnpm test
+
+      - name: Compute next version
+        id: version
+        env:
+          BUMP: ${{ inputs.bump || 'patch' }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+        run: node .github/scripts/next-version.mjs
+
+      - name: Build Chrome and Firefox packages
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          pnpm build
+          pnpm build:firefox
+          mkdir -p dist
+          (cd build/chrome-mv3-prod && zip -qr "$GITHUB_WORKSPACE/dist/star-sorter-${VERSION}-chrome.zip" .)
+          (cd build/firefox-mv3-prod && zip -qr "$GITHUB_WORKSPACE/dist/star-sorter-${VERSION}-firefox.zip" .)
+          ls -lh dist
+
+      - name: Commit the version bump and push the tag
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+          CHANGED: ${{ steps.version.outputs.changed }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if [ "$CHANGED" = "true" ]; then
+            git add package.json
+            git commit -m "chore(release): $TAG [skip release]"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+
+          git tag -a "$TAG" -m "Star Sorter $TAG"
+          git push origin "$TAG"
+
+      - name: Write release notes
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 "${TAG}^" 2>/dev/null || true)
+
+          {
+            echo "Star Sorter **${VERSION}** is ready to install."
+            echo
+            echo "### Install in Chrome or Edge"
+            echo
+            echo "1. Download \`star-sorter-${VERSION}-chrome.zip\` below and unzip it."
+            echo "2. Open \`chrome://extensions\` and enable **Developer mode**."
+            echo "3. Choose **Load unpacked** and select the unzipped folder."
+            echo
+            echo "### Install in Firefox"
+            echo
+            echo "1. Download \`star-sorter-${VERSION}-firefox.zip\` and unzip it."
+            echo "2. Open \`about:debugging#/runtime/this-firefox\`."
+            echo "3. Choose **Load Temporary Add-on** and select the unzipped \`manifest.json\`."
+            echo
+            echo "> The Firefox build is unsigned, so it stays loaded only for the current session."
+            echo
+            echo "### Changes"
+            echo
+            if [ -n "$PREVIOUS_TAG" ]; then
+              git log --no-merges --pretty=format:"- %s (%h)" "$PREVIOUS_TAG..$TAG"
+            else
+              git log --no-merges --pretty=format:"- %s (%h)" "$TAG"
+            fi
+            echo
+            echo
+            echo "### Checksums"
+            echo
+            echo '```'
+            (cd dist && sha256sum ./*.zip)
+            echo '```'
+          } > release-notes.md
+
+          cat release-notes.md
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          gh release create "$TAG" dist/*.zip \
+            --title "Star Sorter $TAG" \
+            --notes-file release-notes.md \
+            --verify-tag \
+            --latest

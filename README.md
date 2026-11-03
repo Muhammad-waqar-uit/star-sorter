@@ -12,6 +12,12 @@
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-strict-3178c6.svg" />
   <img alt="Manifest V3" src="https://img.shields.io/badge/manifest-v3-238636.svg" />
   <img alt="Tests" src="https://img.shields.io/badge/tests-37%20passing-238636.svg" />
+  <img alt="UI: Tailwind CSS + Lucide" src="https://img.shields.io/badge/UI-Tailwind%20%2B%20Lucide-38bdf8.svg" />
+</p>
+
+<p align="center">
+  <a href="https://github.com/Muhammad-waqar-uit/star-sorter/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/Muhammad-waqar-uit/star-sorter?label=latest&color=6d7cf2" /></a>
+  <a href="https://github.com/Muhammad-waqar-uit/star-sorter/actions/workflows/release.yml"><img alt="Release workflow" src="https://github.com/Muhammad-waqar-uit/star-sorter/actions/workflows/release.yml/badge.svg" /></a>
 </p>
 
 ---
@@ -26,6 +32,19 @@ GitHub Lists are the folders on your Stars page, but filing hundreds of reposito
 - **Mistakes are reversible.** Every run records the previous list memberships so you can undo it.
 - **Works where you work.** A floating panel on your GitHub Stars page, in GitHub's light and dark themes.
 
+## Download and install
+
+**[Open the latest release →](https://github.com/Muhammad-waqar-uit/star-sorter/releases/latest)**
+
+Each release ships two ready-to-load builds:
+
+| File | Browser | How to install |
+| --- | --- | --- |
+| `star-sorter-<version>-chrome.zip` | Chrome, Edge, Brave, Arc | Unzip → open `chrome://extensions` → enable **Developer mode** → **Load unpacked** → select the unzipped folder. |
+| `star-sorter-<version>-firefox.zip` | Firefox 128+ | Unzip → open `about:debugging#/runtime/this-firefox` → **Load Temporary Add-on** → select `manifest.json`. |
+
+Releases are published automatically by the [Release workflow](.github/workflows/release.yml) on every push to `main`: it typechecks, runs the tests, builds both targets, bumps the version, tags the commit and attaches the zips. The Firefox build is unsigned, so it stays installed only for the current session; Chrome/Edge keep the unpacked extension until you remove it.
+
 ## Features
 
 | | |
@@ -39,10 +58,11 @@ GitHub Lists are the folders on your Stars page, but filing hundreds of reposito
 | **Undo** | Restores the previous memberships of the last run and removes lists that run created when they are empty. |
 | **List management** | Create, rename, change privacy and delete lists, with the 32-list GitHub limit surfaced early. |
 | **Popup & options** | Status at a glance, full-size rule editing, preferences, privacy notes and a data-reset zone. |
+| **Polished UI** | Tailwind CSS design tokens, a GitHub-matching light/dark theme, Lucide icons and focus-visible states, all isolated in a shadow root. |
 
-## Install
+## Build from source
 
-### From source (development)
+### Development
 
 Requirements: **Node 20+**, **pnpm**, and a Chromium browser (Chrome or Edge).
 
@@ -63,6 +83,8 @@ pnpm build           # Chrome/Edge MV3 → build/chrome-mv3-prod
 pnpm build:firefox   # optional Firefox MV3 → build/firefox-mv3-prod
 pnpm package         # zip for the Chrome Web Store / Edge Add-ons
 ```
+
+To publish the next version yourself, either push to `main` or run the **Release** workflow manually (`Actions → Release → Run workflow`). See [Releasing](docs/RELEASING.md) for version rules and recovery steps.
 
 > **Windows note:** Plasmo's bundler (Parcel) uses native modules that need the Microsoft Visual C++ Redistributable (x64). If `pnpm build` fails with `ERR_DLOPEN_FAILED ... .node`, install the [latest VC++ redistributable](https://aka.ms/vs/17/release/vc_redist.x64.exe) once and rerun the build.
 
@@ -92,7 +114,7 @@ GitHub Stars page
 
 - All GitHub requests and the token stay in the background worker, out of page context and page CSP.
 - The preview renders only the visible rows (windowing), so 5,000 stars stay responsive.
-- The rules engine and planning/merge logic are pure TypeScript in `src/lib`, unit tested with Vitest.
+- The interface uses Tailwind CSS and per-icon Lucide imports; only the icons in use are bundled, and the panel's styles never leak into GitHub.
 - `updateUserListsForItem` replaces the complete membership set, so the worker always merges the target list with the repo's current lists.
 - Progress is written to storage and polled by the panel, so closing and reopening the panel reconnects to a running apply.
 
@@ -108,7 +130,7 @@ src/
 │   └── messages/            validate-token · session · scan · scan-progress · apply · progress · cancel · undo · lists · clear-data
 ├── contents/
 │   └── stars-panel.tsx      Stars-page detection, floating button, shadow DOM
-├── components/              Panel, PlanTable, RulesEditor, VisualRulesEditor, ChipInput, ListManager, TokenForm, ProgressBar, SettingsTab
+├── components/              Panel, PlanTable, RulesEditor, VisualRulesEditor, ChipInput, ListManager, TokenForm, ProgressBar, SettingsTab, icons.ts
 ├── lib/
 │   ├── github.ts            GraphQL client, queries, retries, pagination
 │   ├── rules.ts             rule matching, classification, validation
@@ -120,9 +142,10 @@ src/
 │   └── client.ts            typed message wrappers for the UI
 ├── options.tsx              full options page
 ├── popup.tsx                toolbar popup
-└── style.css                panel + page styles
+└── style.css                Tailwind entry: theme tokens, components and scrollbars
 assets/                      512×512 icon (Plasmo generates the icon set) and brand files
-docs/                        architecture, features, limitations, plan, progress, testing, requirements
+.github/                     CI + automatic release workflow and the version script
+docs/                        architecture, features, limitations, plan, progress, releasing, testing, requirements
 ```
 
 ## Security & privacy
@@ -139,13 +162,14 @@ docs/                        architecture, features, limitations, plan, progress
 - [Limitations](docs/LIMITATIONS.md) — known gaps and sharp edges
 - [Plan](docs/PLAN.md) — milestones and remaining work
 - [Progress](docs/PROGRESS.md) — status snapshot and verification results
+- [Releasing](docs/RELEASING.md) — automatic versioning, release assets and recovery
 - [Testing](docs/TESTING.md) — automated tests and the manual end-to-end checklist
 - [Store listing](docs/STORE_LISTING.md) — copy, permission justifications and the submission checklist
 - [Requirements](docs/REQUIREMENTS.pdf) — the original product and technical spec
 
 ## Contributing
 
-Issues and pull requests are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) first; run `pnpm typecheck`, `pnpm test` and `pnpm build` before opening a PR.
+Issues and pull requests are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) first; run `pnpm typecheck`, `pnpm test` and `pnpm build` before opening a PR. Merging to `main` publishes the next release automatically, so keep `main` green.
 
 ## License
 

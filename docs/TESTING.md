@@ -3,12 +3,15 @@
 ## Automated
 
 ```bash
-pnpm typecheck   # strict TypeScript, no emit
-pnpm test        # Vitest, single run
-pnpm build       # Plasmo production build
+pnpm typecheck        # strict TypeScript, no emit
+pnpm test             # Vitest, single run
+pnpm build            # Chrome/Edge production build
+pnpm build:firefox    # Firefox MV3 production build
 ```
 
-Current status: **37 tests in 4 files pass**, typecheck passes, production build succeeds.
+Current status: **37 tests in 4 files pass**, typecheck passes, both production builds succeed.
+The [Release workflow](../.github/workflows/release.yml) runs the same checks before it tags a
+version or publishes assets, so a red build can never ship.
 
 ### What is covered
 
@@ -28,7 +31,9 @@ Use a throwaway GitHub account with ~50 stars before running on a large collecti
 
 ### Setup
 
-1. `pnpm dev`, load `build/chrome-mv3-dev` unpacked.
+1. `pnpm dev`, load `build/chrome-mv3-dev` unpacked. For a release build, download the zip from
+   the latest GitHub Release and load the unzipped folder; `chrome://extensions` should show the
+   same version as the release tag.
 2. Open a Stars page: the **Sort stars** button appears. Open a non-stars profile tab: it does
    not.
 3. Navigate between profile tabs (Turbo): the button appears/disappears without a reload.

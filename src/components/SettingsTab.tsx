@@ -1,3 +1,4 @@
+import { ExternalLink, Palette, ShieldCheck, SlidersHorizontal, Trash2 } from "./icons"
 import { useState } from "react"
 
 import { clearAllData, SorterError } from "../lib/client"
@@ -9,6 +10,21 @@ type Props = {
   settings: Settings
   onSettings: (settings: Settings) => void | Promise<void>
   onChanged: () => void | Promise<void>
+}
+
+function SectionTitle({
+  icon: Icon,
+  children
+}: {
+  icon: typeof Palette
+  children: string
+}) {
+  return (
+    <h3 className="mb-2 flex items-center gap-1.5 text-[12px] font-bold text-ink">
+      <Icon className="h-3.5 w-3.5 text-muted" aria-hidden="true" />
+      {children}
+    </h3>
+  )
 }
 
 export function SettingsTab({ session, settings, onSettings, onChanged }: Props) {
@@ -37,56 +53,68 @@ export function SettingsTab({ session, settings, onSettings, onChanged }: Props)
   }
 
   return (
-    <div>
+    <div className="space-y-4">
       <TokenForm
         connected={Boolean(session?.connected)}
         login={session?.account?.login}
         onChanged={onChanged}
       />
 
-      <h3 style={{ marginTop: 16 }}>Appearance</h3>
-      <div className="ss-row">
-        <label className="ss-hint" htmlFor="ss-theme">
-          Theme
+      <section>
+        <SectionTitle icon={Palette}>Appearance</SectionTitle>
+        <div className="flex items-center gap-2">
+          <label className="text-[12px] text-muted" htmlFor="ss-theme">
+            Theme
+          </label>
+          <select
+            id="ss-theme"
+            className="ss-select w-auto"
+            value={settings.theme}
+            onChange={(event) => void update({ theme: event.target.value as Settings["theme"] })}>
+            <option value="auto">Match GitHub</option>
+            <option value="dark">Dark</option>
+            <option value="light">Light</option>
+          </select>
+        </div>
+      </section>
+
+      <section>
+        <SectionTitle icon={SlidersHorizontal}>Defaults</SectionTitle>
+        <label className="ss-check">
+          <input
+            type="checkbox"
+            checked={settings.includeSorted}
+            onChange={(event) => void update({ includeSorted: event.target.checked })}
+          />
+          Show repos that are already in a list after scanning
         </label>
-        <select
-          id="ss-theme"
-          value={settings.theme}
-          onChange={(event) => void update({ theme: event.target.value as Settings["theme"] })}>
-          <option value="auto">Match GitHub</option>
-          <option value="dark">Dark</option>
-          <option value="light">Light</option>
-        </select>
-      </div>
+      </section>
 
-      <h3>Defaults</h3>
-      <label className="ss-check">
-        <input
-          type="checkbox"
-          checked={settings.includeSorted}
-          onChange={(event) => void update({ includeSorted: event.target.checked })}
-        />
-        Show repos that are already in a list after scanning
-      </label>
+      <section className="rounded-xl border border-line bg-surface2/50 p-3">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <button
+            className="ss-btn ss-btn-sm"
+            type="button"
+            onClick={() => chrome.runtime.openOptionsPage()}>
+            <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+            Open full options
+          </button>
+          <button
+            className="ss-btn ss-btn-sm ss-btn-danger"
+            type="button"
+            onClick={() => void handleClear()}
+            disabled={busy !== null}>
+            <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+            Clear all data
+          </button>
+        </div>
+        {message && <div className="ss-alert mt-2">{message}</div>}
+      </section>
 
-      <div className="ss-row" style={{ marginTop: 16 }}>
-        <button className="ss-btn" type="button" onClick={() => chrome.runtime.openOptionsPage()}>
-          Open full options
-        </button>
-        <button
-          className="ss-btn danger"
-          type="button"
-          onClick={() => void handleClear()}
-          disabled={busy !== null}>
-          Clear all extension data
-        </button>
-      </div>
-
-      {message && <div className="ss-alert">{message}</div>}
-
-      <p className="ss-hint" style={{ marginTop: 16 }}>
-        Star Sorter keeps the token, rules and undo log in chrome.storage.local. No analytics,
-        no backend, no requests outside api.github.com.
+      <p className="flex items-start gap-1.5 text-[11px] leading-relaxed text-muted">
+        <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+        Star Sorter keeps the token, rules and undo log in chrome.storage.local. No analytics, no
+        backend, no requests outside api.github.com.
       </p>
     </div>
   )

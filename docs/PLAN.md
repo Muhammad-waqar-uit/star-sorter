@@ -12,7 +12,7 @@ Milestones follow the original specification. Status reflects the repository as 
 
 ## M1 — Core (done)
 
-- Plasmo project, strict TypeScript, React 18, plain CSS in a shadow root.
+- Plasmo project, strict TypeScript, React 18, Tailwind CSS in a shadow root.
 - Background worker owns the token and all GraphQL traffic.
 - Token form with validation.
 - Star and list scan with pagination.
@@ -44,6 +44,7 @@ Milestones follow the original specification. Status reflects the repository as 
 
 ## M5 — Polish (done)
 
+- Tailwind design tokens, Lucide icons and a component layer shared by the panel and pages.
 - Light/dark themes from GitHub, plus manual override.
 - ARIA labels, focus states, keyboard-operable controls.
 - Popup and options pages.
@@ -55,6 +56,9 @@ Milestones follow the original specification. Status reflects the repository as 
   ([PRIVACY.md](PRIVACY.md)); screenshots and submission **remaining**.
 - Firefox build: `pnpm build:firefox` produces a valid MV3 package; runtime smoke test **remaining**.
 - CI: typecheck, tests and production build on every push.
+- Release automation: every push to `main` typechecks, tests, builds both targets, bumps the
+  version, tags it and publishes a GitHub Release with ready-to-load zips (see
+  [RELEASING.md](RELEASING.md)). **Done.**
 
 ## Next up
 

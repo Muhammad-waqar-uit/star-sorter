@@ -1,3 +1,4 @@
+import { X } from "./icons"
 import { useState } from "react"
 
 type Props = {
@@ -33,7 +34,7 @@ export function ChipInput({ id, label, values, placeholder, onChange }: Props) {
 
   return (
     <div className="ss-field">
-      <label className="ss-field-label" htmlFor={id}>
+      <label className="ss-label" htmlFor={id}>
         {label}
       </label>
       <div className="ss-chips">
@@ -44,7 +45,7 @@ export function ChipInput({ id, label, values, placeholder, onChange }: Props) {
               type="button"
               aria-label={`Remove ${value} from ${label}`}
               onClick={() => onChange(values.filter((entry) => entry !== value))}>
-              ×
+              <X className="h-2.5 w-2.5" aria-hidden="true" />
             </button>
           </span>
         ))}

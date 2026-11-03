@@ -1,6 +1,7 @@
 import cssText from "data-text:~style.css"
 import type { PlasmoCSConfig } from "plasmo"
 import { useEffect, useState } from "react"
+import { Star } from "../components/icons"
 
 import { Panel } from "../components/Panel"
 import { getSettings } from "../lib/storage"
@@ -118,16 +119,14 @@ export default function StarsPanel() {
       {!open && (
         <button
           type="button"
-          className={`ss-fab ss-theme-${theme}`}
+          className={`ss-fab ${theme === "dark" ? "ss-theme-dark" : "ss-theme-light"}`}
           aria-label="Sort my GitHub stars"
           onClick={() => {
             setOpen(true)
             setEverOpened(true)
           }}>
-          <svg viewBox="0 0 16 16" aria-hidden="true" fill="currentColor">
-            <path d="M8 1.5l1.8 3.9 4.2.5-3.1 2.9.8 4.2L8 10.9l-3.7 2.1.8-4.2L2 5.9l4.2-.5L8 1.5z" />
-          </svg>
-          Sort stars
+          <Star className="h-4 w-4" strokeWidth={2.4} fill="currentColor" aria-hidden="true" />
+          <span>Sort stars</span>
         </button>
       )}
 

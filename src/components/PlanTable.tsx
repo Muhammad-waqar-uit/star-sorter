@@ -1,3 +1,4 @@
+import { ChevronDown, ChevronRight, Inbox, LayoutGrid, List, Search } from "./icons"
 import { useEffect, useMemo, useRef, useState } from "react"
 
 import { groupPlan, isRepoInList, normalizeListName } from "../lib/plan"
@@ -173,11 +174,12 @@ export function PlanTable({
     <div className="ss-tr">
       <input
         type="checkbox"
+        className="accent-accent"
         checked={selected.has(item.repoId)}
         aria-label={`Select ${item.nameWithOwner}`}
         onChange={() => toggleSelected(item.repoId)}
       />
-      <div className="ss-repo">
+      <div className="ss-repo min-w-0">
         <a href={`https://github.com/${item.nameWithOwner}`} target="_blank" rel="noreferrer">
           {item.nameWithOwner}
         </a>
@@ -186,6 +188,7 @@ export function PlanTable({
       <div className="ss-lang">{item.topics.slice(0, 3).join(" · ") || "—"}</div>
       <div className="ss-lang">{item.language || "—"}</div>
       <select
+        className="ss-select ss-select-sm"
         aria-label={`Target list for ${item.nameWithOwner}`}
         value={item.target ?? SKIP}
         onChange={(event) => {
@@ -211,9 +214,10 @@ export function PlanTable({
   const viewport = Math.min(VIEWPORT_HEIGHT, metrics.totalHeight)
 
   return (
-    <div>
-      <div className="ss-toolbar">
+    <div className="space-y-2">
+      <div className="flex flex-wrap items-center gap-1.5">
         <select
+          className="ss-select ss-select-sm w-auto"
           aria-label="Filter repos"
           value={filter}
           onChange={(event) => setFilter(event.target.value as Filter)}>
@@ -223,37 +227,51 @@ export function PlanTable({
           <option value="unsorted">Unsorted ({counts.unsorted})</option>
           <option value="already">Already filed ({counts.already})</option>
         </select>
-        <input
-          type="search"
-          value={search}
-          placeholder="Search name or description"
-          aria-label="Search repos"
-          onChange={(event) => setSearch(event.target.value)}
-        />
+
+        <div className="relative min-w-[130px] flex-1">
+          <Search
+            className="pointer-events-none absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted"
+            aria-hidden="true"
+          />
+          <input
+            type="search"
+            className="ss-input py-1 pl-7 text-[11.5px]"
+            value={search}
+            placeholder="Search repos"
+            aria-label="Search repos"
+            onChange={(event) => setSearch(event.target.value)}
+          />
+        </div>
+
         <button
-          className="ss-btn"
+          className="ss-btn ss-btn-sm"
           type="button"
           aria-pressed={grouped}
+          title={grouped ? "Show a flat list" : "Group by suggested list"}
           onClick={() => setGrouped((value) => !value)}>
-          {grouped ? "Ungroup" : "Group"}
+          {grouped ? (
+            <LayoutGrid className="h-3.5 w-3.5" aria-hidden="true" />
+          ) : (
+            <List className="h-3.5 w-3.5" aria-hidden="true" />
+          )}
+          {grouped ? "Flat" : "Group"}
         </button>
       </div>
 
-      <div className="ss-toolbar">
-        <label className="ss-check">
-          <input
-            type="checkbox"
-            checked={includeSorted}
-            onChange={(event) => onIncludeSorted(event.target.checked)}
-          />
-          Include repos already in a list
-        </label>
-      </div>
+      <label className="ss-check">
+        <input
+          type="checkbox"
+          checked={includeSorted}
+          onChange={(event) => onIncludeSorted(event.target.checked)}
+        />
+        Include repos already in a list
+      </label>
 
       {selected.size > 0 && (
-        <div className="ss-toolbar">
-          <span className="ss-badge">{selected.size} selected</span>
+        <div className="flex flex-wrap items-center gap-1.5 rounded-lg border border-accent/25 bg-accent-soft px-2 py-1.5">
+          <span className="ss-badge ss-badge-accent tabular-nums">{selected.size} selected</span>
           <select
+            className="ss-select ss-select-sm w-auto"
             aria-label="Set list for selected repos"
             value={bulkTarget}
             onChange={(event) => {
@@ -269,7 +287,10 @@ export function PlanTable({
             ))}
             <option value={SKIP}>Skip all</option>
           </select>
-          <button className="ss-btn" type="button" onClick={() => setSelected(new Set())}>
+          <button
+            className="ss-btn ss-btn-sm ss-btn-ghost ml-auto"
+            type="button"
+            onClick={() => setSelected(new Set())}>
             Clear
           </button>
         </div>
@@ -277,6 +298,7 @@ export function PlanTable({
 
       {visible.length === 0 ? (
         <div className="ss-empty">
+          <Inbox className="mx-auto mb-2 h-6 w-6 text-muted/70" aria-hidden="true" />
           <strong>No repos here</strong>
           {items.length === 0
             ? "Scan your stars to build a plan."
@@ -287,6 +309,7 @@ export function PlanTable({
           <div className="ss-thead">
             <input
               type="checkbox"
+              className="accent-accent"
               checked={allSelected}
               aria-label="Select all visible repos"
               onChange={toggleAll}
@@ -321,9 +344,13 @@ export function PlanTable({
                         className="ss-group"
                         aria-expanded={!row.collapsed}
                         onClick={() => toggleGroup(row.name)}>
-                        <span aria-hidden>{row.collapsed ? "▸" : "▾"}</span>
-                        <span>{row.name}</span>
-                        <span className="count">{row.count}</span>
+                        {row.collapsed ? (
+                          <ChevronRight className="h-3.5 w-3.5 text-muted" aria-hidden="true" />
+                        ) : (
+                          <ChevronDown className="h-3.5 w-3.5 text-muted" aria-hidden="true" />
+                        )}
+                        <span className="truncate">{row.name}</span>
+                        <span className="ss-badge ml-auto tabular-nums">{row.count}</span>
                       </button>
                     ) : (
                       renderRow(row.item)
@@ -336,7 +363,7 @@ export function PlanTable({
         </div>
       )}
 
-      <p className="ss-hint">
+      <p className="text-[11px] tabular-nums text-muted">
         {summary.moves} move{summary.moves === 1 ? "" : "s"} · {summary.unchanged} already filed ·{" "}
         {summary.skips} skipped · {summary.listsTouched} list
         {summary.listsTouched === 1 ? "" : "s"} touched

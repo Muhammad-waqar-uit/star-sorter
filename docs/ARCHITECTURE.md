@@ -1,7 +1,7 @@
 # Architecture
 
-Star Sorter is a Plasmo (Manifest V3) extension built with React and TypeScript. It has no
-backend, no build-time server and no remote code. The design goal is a small trusted core:
+Star Sorter is a Plasmo (Manifest V3) extension built with React, TypeScript, Tailwind CSS and
+Lucide icons. It has no backend, no build-time server and no remote code. The design goal is a small trusted core:
 **all network traffic and the GitHub token live in one place**, and every decision that can
 go wrong is previewable and reversible.
 
@@ -19,6 +19,7 @@ go wrong is previewable and reversible.
 | Core library | `src/lib/*.ts` | Pure rules engine, planning and merge helpers, GraphQL client, storage access. Unit tested. |
 | Options page | `src/options.tsx` | Token, full rules editor, preferences, privacy and data reset. |
 | Popup | `src/popup.tsx` | Connection status, last scan, quick links. |
+| Design system | `src/style.css`, `src/components/icons.ts`, `tailwind.config.js` | RGB-channel theme tokens (light/dark), shared component classes, and per-icon Lucide imports so unused icons stay out of the bundle. |
 
 ## Data flow
 
@@ -113,6 +114,20 @@ Everything is `chrome.storage.local`:
 - Repo descriptions and list names are untrusted text: rendered as React text nodes only.
 - Panel styles are injected into a shadow root, so GitHub's CSS and ours cannot collide.
 - The extension requests only `storage` and `https://api.github.com/*`.
+
+## Build and release
+
+- `pnpm build` and `pnpm build:firefox` are the only production builds. Plasmo reads `version`
+  from `package.json`, so the manifest and release tag cannot drift.
+- The [Release workflow](../.github/workflows/release.yml) runs on every push to `main`. It
+  installs with the frozen lockfile, typechecks, runs the 37 unit tests, builds both targets,
+  zips them, computes the next semantic version, commits the bump, tags it and creates a GitHub
+  Release with notes and checksums.
+- Version selection lives in `.github/scripts/next-version.mjs`: an untagged `package.json`
+  version is released as-is; otherwise patch is bumped, or minor/major on request. See
+  [RELEASING.md](RELEASING.md).
+- The workflow writes with the repository `GITHUB_TOKEN` (`contents: write`). It never needs a
+  personal token, store credential or backend secret.
 
 ## Deliberate trade-offs
 

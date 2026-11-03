@@ -7,6 +7,7 @@
 | [LIMITATIONS.md](LIMITATIONS.md) | Known gaps, platform constraints and sharp edges |
 | [PLAN.md](PLAN.md) | Milestones M0–M6 and what remains |
 | [PROGRESS.md](PROGRESS.md) | Current status and verification results |
+| [RELEASING.md](RELEASING.md) | Automatic versioning, release assets, recovery and rollback |
 | [TESTING.md](TESTING.md) | Automated tests and the manual end-to-end checklist |
 | [PRIVACY.md](PRIVACY.md) | Data handling and store-listing privacy text |
 | [REQUIREMENTS.pdf](REQUIREMENTS.pdf) | Original product and technical specification |

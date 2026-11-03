@@ -1,3 +1,10 @@
+import {
+  ArrowDown,
+  ArrowUp,
+  GripVertical,
+  Plus,
+  Trash2
+} from "./icons"
 import { useMemo, useState } from "react"
 
 import { matchesRule } from "../lib/rules"
@@ -67,21 +74,22 @@ export function VisualRulesEditor({ draft, repos, onChange }: Props) {
   }
 
   return (
-    <div>
-      <div className="ss-row">
+    <div className="space-y-2">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 rounded-xl border border-line bg-surface2/50 px-3 py-2">
         <label className="ss-check">
           <input
             type="checkbox"
             checked={draft.private}
             onChange={(event) => onChange({ ...draft, private: event.target.checked })}
           />
-          Create new lists as private
+          Private new lists
         </label>
 
-        <label className="ss-inline-field">
+        <label className="flex items-center gap-1.5 text-[12px] text-muted">
           Lists per repo
           <input
             type="number"
+            className="ss-input w-14 px-1.5 py-1 text-center"
             min={1}
             max={32}
             value={draft.maxListsPerRepo}
@@ -97,13 +105,14 @@ export function VisualRulesEditor({ draft, repos, onChange }: Props) {
         </label>
       </div>
 
-      <p className="ss-hint">
-        Drag the handle to reorder. Rules run top to bottom and the first match wins.
+      <p className="flex items-center gap-1 text-[11px] text-muted">
+        <GripVertical className="h-3 w-3" aria-hidden="true" />
+        Drag to reorder. Rules run top to bottom; the first match wins.
       </p>
 
       {draft.lists.map((rule, index) => (
         <article
-          className={`ss-rule-edit ${dragIndex === index ? "dragging" : ""}`}
+          className={`ss-rule-card ${dragIndex === index ? "dragging" : ""}`}
           key={index}
           onDragOver={(event) => {
             if (dragIndex === null || dragIndex === index) return
@@ -120,51 +129,57 @@ export function VisualRulesEditor({ draft, repos, onChange }: Props) {
               title="Drag to reorder"
               onDragStart={() => setDragIndex(index)}
               onDragEnd={() => setDragIndex(null)}>
-              ⠿
+              <GripVertical className="h-3.5 w-3.5" aria-hidden="true" />
             </button>
+
             <input
-              className="ss-grow"
+              className="ss-input min-w-0 flex-1 font-semibold"
               value={rule.name}
               maxLength={32}
               aria-label="List name"
               placeholder="List name"
               onChange={(event) => updateRule(index, { name: event.target.value })}
             />
-            <span className="ss-badge">{matchCounts[index] ?? 0} stars</span>
-            <button
-              type="button"
-              className="ss-icon-btn"
-              aria-label={`Move ${rule.name || "rule"} up`}
-              disabled={index === 0}
-              onClick={() => moveRule(index, index - 1)}>
-              ↑
-            </button>
-            <button
-              type="button"
-              className="ss-icon-btn"
-              aria-label={`Move ${rule.name || "rule"} down`}
-              disabled={index === draft.lists.length - 1}
-              onClick={() => moveRule(index, index + 1)}>
-              ↓
-            </button>
-            <button
-              type="button"
-              className="ss-icon-btn"
-              aria-label={`Delete ${rule.name || "rule"}`}
-              onClick={() => removeRule(index)}>
-              ×
-            </button>
+
+            <span className="ss-badge shrink-0 tabular-nums">{matchCounts[index] ?? 0} stars</span>
+
+            <div className="flex shrink-0 items-center gap-0.5">
+              <button
+                type="button"
+                className="ss-btn ss-btn-icon ss-btn-ghost"
+                aria-label={`Move ${rule.name || "rule"} up`}
+                title="Move up"
+                disabled={index === 0}
+                onClick={() => moveRule(index, index - 1)}>
+                <ArrowUp className="h-3.5 w-3.5" aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                className="ss-btn ss-btn-icon ss-btn-ghost"
+                aria-label={`Move ${rule.name || "rule"} down`}
+                title="Move down"
+                disabled={index === draft.lists.length - 1}
+                onClick={() => moveRule(index, index + 1)}>
+                <ArrowDown className="h-3.5 w-3.5" aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                className="ss-btn ss-btn-icon ss-btn-ghost hover:text-danger"
+                aria-label={`Delete ${rule.name || "rule"}`}
+                title="Delete rule"
+                onClick={() => removeRule(index)}>
+                <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+              </button>
+            </div>
           </div>
 
-          <div className="ss-row">
-            <input
-              className="ss-grow"
-              value={rule.description ?? ""}
-              aria-label="List description"
-              placeholder="List description (optional)"
-              onChange={(event) => updateRule(index, { description: event.target.value })}
-            />
-          </div>
+          <input
+            className="ss-input mb-1.5"
+            value={rule.description ?? ""}
+            aria-label="List description"
+            placeholder="List description (optional)"
+            onChange={(event) => updateRule(index, { description: event.target.value })}
+          />
 
           <ChipInput
             id={`rule-topics-${index}`}
@@ -204,11 +219,12 @@ export function VisualRulesEditor({ draft, repos, onChange }: Props) {
         </article>
       ))}
 
-      <div className="ss-row">
-        <button className="ss-btn" type="button" onClick={addRule}>
-          + Add rule
+      <div className="flex flex-wrap items-center gap-2">
+        <button className="ss-btn ss-btn-sm" type="button" onClick={addRule}>
+          <Plus className="h-3.5 w-3.5" aria-hidden="true" />
+          Add rule
         </button>
-        <span className="ss-hint">
+        <span className="text-[11px] tabular-nums text-muted">
           {draft.lists.length} of 32 lists · {repos.length} stars evaluated
         </span>
       </div>
