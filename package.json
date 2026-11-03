@@ -1,7 +1,7 @@
 {
   "name": "star-sorter",
   "displayName": "Star Sorter for GitHub",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Organize your GitHub stars into GitHub Lists automatically, with an editable preview, rule management and undo.",
   "author": "Muhammad Waqar",
   "license": "MIT",
