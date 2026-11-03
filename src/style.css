@@ -6,14 +6,16 @@
 
 @layer base {
   .ss-theme-dark {
-    --ss-bg: 11 15 25;
-    --ss-surface: 17 24 39;
-    --ss-surface-2: 26 34 51;
-    --ss-border: 39 50 68;
-    --ss-text: 232 237 247;
-    --ss-muted: 147 161 184;
-    --ss-input: 13 20 34;
-    --ss-hover: 30 41 59;
+    --ss-bg: 13 18 28;
+    --ss-surface: 24 33 47;
+    --ss-surface-2: 35 47 65;
+    --ss-border: 62 79 104;
+    --ss-text: 244 247 252;
+    --ss-muted: 176 188 208;
+    --ss-input: 17 26 40;
+    --ss-hover: 44 58 79;
+    --ss-accent: 154 169 255;
+    --ss-accent-strong: 133 150 250;
     color-scheme: dark;
   }
 
@@ -21,11 +23,13 @@
     --ss-bg: 247 248 252;
     --ss-surface: 255 255 255;
     --ss-surface-2: 241 244 250;
-    --ss-border: 223 229 239;
+    --ss-border: 214 222 235;
     --ss-text: 24 32 52;
-    --ss-muted: 100 116 139;
+    --ss-muted: 92 107 132;
     --ss-input: 255 255 255;
     --ss-hover: 238 242 249;
+    --ss-accent: 85 99 232;
+    --ss-accent-strong: 68 82 214;
     color-scheme: light;
   }
 
@@ -33,24 +37,28 @@
     --ss-bg: 247 248 252;
     --ss-surface: 255 255 255;
     --ss-surface-2: 241 244 250;
-    --ss-border: 223 229 239;
+    --ss-border: 214 222 235;
     --ss-text: 24 32 52;
-    --ss-muted: 100 116 139;
+    --ss-muted: 92 107 132;
     --ss-input: 255 255 255;
     --ss-hover: 238 242 249;
+    --ss-accent: 85 99 232;
+    --ss-accent-strong: 68 82 214;
     color-scheme: light;
   }
 
   @media (prefers-color-scheme: dark) {
     .ss-page {
-      --ss-bg: 11 15 25;
-      --ss-surface: 17 24 39;
-      --ss-surface-2: 26 34 51;
-      --ss-border: 39 50 68;
-      --ss-text: 232 237 247;
-      --ss-muted: 147 161 184;
-      --ss-input: 13 20 34;
-      --ss-hover: 30 41 59;
+      --ss-bg: 13 18 28;
+      --ss-surface: 24 33 47;
+      --ss-surface-2: 35 47 65;
+      --ss-border: 62 79 104;
+      --ss-text: 244 247 252;
+      --ss-muted: 176 188 208;
+      --ss-input: 17 26 40;
+      --ss-hover: 44 58 79;
+      --ss-accent: 154 169 255;
+      --ss-accent-strong: 133 150 250;
       color-scheme: dark;
     }
   }
@@ -72,7 +80,7 @@
   }
 
   .ss-panel {
-    color: rgb(var(--ss-text));
+    color: rgb(var(--ss-text, 244 247 252));
   }
 
   .ss-page {
@@ -100,9 +108,13 @@
 
   /* Panel shell */
   .ss-panel {
-    @apply fixed bottom-[74px] right-5 z-[2147483001] flex flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-panel;
+    @apply fixed bottom-[74px] right-5 z-[2147483001] flex flex-col overflow-hidden rounded-2xl border border-line shadow-panel;
     width: min(600px, calc(100vw - 40px));
     max-height: min(82vh, 820px);
+    /* Explicit fallback keeps the panel readable even if a theme class is
+       stripped or fails to load. */
+    background-color: rgb(var(--ss-surface, 24 33 47));
+    color: rgb(var(--ss-text, 244 247 252));
   }
 
   .ss-panel-header {
@@ -258,6 +270,21 @@
 
   .ss-lang {
     @apply truncate text-[10.5px] text-muted;
+  }
+
+  /* Narrow panels: drop the topics/language columns instead of truncating
+     every repository name to a few characters. */
+  @media (max-width: 560px) {
+    .ss-thead,
+    .ss-tr {
+      grid-template-columns: 20px minmax(0, 1fr) 132px;
+    }
+
+    .ss-thead > span:nth-child(3),
+    .ss-thead > span:nth-child(4),
+    .ss-tr > .ss-lang {
+      display: none;
+    }
   }
 
   .ss-group {

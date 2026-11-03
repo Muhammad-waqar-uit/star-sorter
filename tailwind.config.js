@@ -16,9 +16,9 @@ module.exports = {
         input: "rgb(var(--ss-input) / <alpha-value>)",
         hover: "rgb(var(--ss-hover) / <alpha-value>)",
         accent: {
-          DEFAULT: "#6d7cf2",
-          strong: "#5563e8",
-          soft: "rgba(109, 124, 242, 0.14)"
+          DEFAULT: "rgb(var(--ss-accent, 109 124 242) / <alpha-value>)",
+          strong: "rgb(var(--ss-accent-strong, 85 99 232) / <alpha-value>)",
+          soft: "rgb(var(--ss-accent, 109 124 242) / 0.14)"
         },
         success: {
           DEFAULT: "#238636",
