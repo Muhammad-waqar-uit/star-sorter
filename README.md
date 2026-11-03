@@ -50,7 +50,7 @@ Releases are published automatically by the [Release workflow](.github/workflows
 | | |
 | --- | --- |
 | **Stars page panel** | Floating _Sort stars_ button, only on `?tab=stars` / `/stars`, inside a shadow DOM so GitHub's CSS is untouched. |
-| **Token management** | Classic token with the `user` scope, validated against `viewer` before it is saved; remove or replace it any time. Choose to keep it (you manage removal) or delete it automatically after each apply run. |
+| **Token management** | Classic token with the `user` scope ([setup guide](docs/TOKEN_SETUP.md)), validated against `viewer` before it is saved; remove or replace it any time. Choose to keep it (you manage removal) or delete it automatically after each apply run. |
 | **Full scan** | Every starred repo (id, name, description, language, topics, stars, updated date, archived flag) plus every list and its members, 100 per page. |
 | **Editable rules** | Visual builder (add, rename, drag-reorder, delete, chip inputs) plus a JSON editor with validation, live per-list match counts, import, export and reset. Bundled defaults for 12 common categories. |
 | **Reviewable plan** | Grouped, searchable, virtualized table with per-repo overrides, bulk assignment, skip, live scan progress and a running count of the moves that will happen. |
@@ -90,12 +90,48 @@ To publish the next version yourself, either push to `main` or run the **Release
 
 ## Use
 
-1. Create a **classic** personal access token with the `user` scope — [open the pre-filled token form](https://github.com/settings/tokens/new?scopes=user&description=Star%20Sorter%20for%20GitHub).
-2. Visit `https://github.com/<you>?tab=stars` and click **Sort stars**.
-3. Paste the token and press **Save token** — the panel shows `Connected as <you>`.
-4. Press **Scan and preview**. Every repo gets a suggested list; unsorted repos are grouped first.
-5. Adjust the dropdowns (or edit rules), then press **Apply**. Existing list memberships are preserved.
-6. If something looks wrong, press **Undo last run**.
+### 1. Create a classic GitHub token
+
+Star Sorter needs a **classic** personal access token with the **`user`** scope. Fine-grained
+tokens do not reliably support GitHub Lists.
+
+1. Open the [pre-filled classic token form](https://github.com/settings/tokens/new?scopes=user&description=Star%20Sorter%20for%20GitHub). To navigate manually: avatar → **Settings** → **Developer settings** → **Personal access tokens** → **Tokens (classic)** → **Generate new token** → **Generate new token (classic)**.
+2. Set **Note** to `Star Sorter for GitHub`.
+3. Set **Expiration** to 30, 60 or 90 days. Avoid **No expiration** unless you have a reason.
+4. Under **Select scopes**, tick **only `user`**. The table below shows the exact choices.
+5. Click **Generate token**, copy the `ghp_…` value (GitHub shows it once), then paste it into Star
+   Sorter and press **Save token**. The panel should show `Connected as <you>`.
+
+#### Scope options
+
+| Scope | Select it? | Why |
+| --- | --- | --- |
+| `user` | **Yes** | Read/write profile data, including GitHub Lists. This is the only scope Star Sorter needs. |
+| `read:user` | No | Read-only profile access. It cannot create or update Lists, so Star Sorter will report a missing-scope error. |
+| `repo`, `public_repo`, `workflow` | No | Repository and Actions access. Star Sorter never reads or edits repository contents. |
+| `admin:*`, `delete_repo`, `write:org` | No | Account or organization administration. Never grant these for Star Sorter. |
+| `gist`, `notifications`, `read:packages` | No | Unrelated to stars and Lists. Leave them unchecked. |
+
+Leave every other scope unchecked unless you have a separate reason for it. The pre-filled link
+sets `user` for you, but verify it before generating the token.
+
+#### Token storage options
+
+Choose one in **Settings → Token storage** (or **Options → Token storage**):
+
+| Option | What happens | Choose it when |
+| --- | --- | --- |
+| **Keep until I remove it** (default) | The token and cached account stay in `chrome.storage.local` across scans, applies and undo. Remove them with **Remove token** or **Clear all extension data**. | You sort stars regularly and accept responsibility for the stored token. |
+| **Delete after each apply run** | When an apply finishes — completed, cancelled or failed — the token and cached account are deleted. Scans, list edits and undo do not delete it. The next apply or undo needs the token pasted again. | You want the token removed automatically after each sorting task. |
+
+Full walkthrough, troubleshooting and revocation: [Create a classic GitHub token](docs/TOKEN_SETUP.md).
+
+### 2. Sort your stars
+
+1. Visit `https://github.com/<you>?tab=stars` and click **Sort stars**.
+2. Press **Scan and preview**. Every repo gets a suggested list; unsorted repos are grouped first.
+3. Adjust the dropdowns (or edit rules), then press **Apply**. Existing list memberships are preserved.
+4. If something looks wrong, press **Undo last run**.
 
 A token is required because only the GraphQL API can read and write lists. Star Sorter never sees your password, never uses OAuth and has no backend.
 
@@ -157,6 +193,7 @@ docs/                        architecture, features, limitations, plan, progress
 
 ## Documentation
 
+- [Create a classic GitHub token](docs/TOKEN_SETUP.md) — exact GitHub steps, scopes, retention options and troubleshooting
 - [Architecture](docs/ARCHITECTURE.md) — components, messaging contracts, storage schema, design decisions
 - [Features](docs/FEATURES.md) — what ships today, traced to the spec
 - [Limitations](docs/LIMITATIONS.md) — known gaps and sharp edges

@@ -38,7 +38,8 @@ Known gaps in v1.0, in rough order of importance.
   `ERR_DLOPEN_FAILED ... .node`. Install the official redistributable and retry. This is a
   tooling dependency, not an extension runtime dependency.
 - **Token type.** Lists require a classic token with the `user` scope. Fine-grained tokens may
-  not expose the list mutations; the UI reports a scope error if GitHub refuses.
+  not expose the list mutations; the UI reports a scope error if GitHub refuses. See
+  [Create a classic GitHub token](TOKEN_SETUP.md) for the exact scope and setup steps.
 
 ## Product limits imposed by GitHub
 

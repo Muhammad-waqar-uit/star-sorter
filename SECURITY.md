@@ -15,7 +15,8 @@
 `chrome.storage.local` is not encrypted. Malware, a shared browser profile, or anyone with
 access to your browser's devtools can read the token. Use a classic token with the smallest
 scope that works (`user`) and revoke it at <https://github.com/settings/tokens> when you no
-longer need it.
+longer need it. Step-by-step creation, scope selection and revocation:
+[docs/TOKEN_SETUP.md](docs/TOKEN_SETUP.md).
 
 ## Reporting a vulnerability
 

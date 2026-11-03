@@ -14,13 +14,19 @@ Status legend: **Shipped** · **Partial** · **Planned**
 
 ## F2. Token management — Shipped
 
-- Password field for a **classic** token with the `user` scope.
+- Password field for a **classic** token with the `user` scope. The form links to GitHub's
+  pre-filled classic token form, a step-by-step setup guide, and the token management page.
+- An expandable **“How to create the token: settings and scopes”** panel covers the token name,
+  expiration, selecting only `user`, why `read:user` and fine-grained tokens do not work, and
+  generating/copying the value.
 - Validated with `viewer { login }` before saving; the panel shows the resolved username.
 - Stored in `chrome.storage.local`, read only by the background worker.
 - Retention choice: **keep until removed** (default, user manages it) or **delete after each
   apply run** (removes the token and cached account when a run finishes, including cancelled or
   failed runs). An undo or the next run needs the token again.
 - Replace and remove token actions, with a direct link to the pre-scoped token form.
+- Full setup, scope table, retention comparison, troubleshooting and revocation steps:
+  [Create a classic GitHub token](TOKEN_SETUP.md).
 - Errors are mapped to readable messages: invalid/expired token, missing scope, rate limit,
   network.
 - Invalid or under-scoped tokens surface a **Fix token** action that opens the token form.

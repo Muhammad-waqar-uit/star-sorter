@@ -7,6 +7,9 @@ import "./style.css"
 import { getSession } from "./lib/client"
 import type { Session } from "./lib/types"
 
+const TOKEN_GUIDE_URL =
+  "https://github.com/Muhammad-waqar-uit/star-sorter/blob/main/docs/TOKEN_SETUP.md"
+
 function Popup() {
   const [session, setSession] = useState<Session | null>(null)
 
@@ -100,10 +103,20 @@ function Popup() {
         </div>
 
         {!session?.connected ? (
-          <p className="mt-2.5 text-[11px] leading-relaxed text-muted">
-            Add a classic token with the <code className="text-[10.5px]">user</code> scope in
-            Options to start sorting.
-          </p>
+          <div className="mt-2.5 text-[11px] leading-relaxed text-muted">
+            <p>
+              Add a classic token with the <code className="text-[10.5px]">user</code> scope in
+              Options to start sorting. Fine-grained tokens cannot manage Lists.
+            </p>
+            <a
+              className="mt-1 inline-flex items-center gap-1 font-medium text-accent hover:underline"
+              href={TOKEN_GUIDE_URL}
+              target="_blank"
+              rel="noreferrer">
+              How to create the token
+              <ExternalLink className="h-3 w-3" aria-hidden="true" />
+            </a>
+          </div>
         ) : (
           <a
             className="mt-2.5 inline-flex items-center gap-1 text-[11px] font-medium text-accent hover:underline"

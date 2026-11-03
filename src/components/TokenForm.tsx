@@ -5,6 +5,9 @@ import { removeToken, saveToken, SorterError } from "../lib/client"
 
 const TOKEN_URL =
   "https://github.com/settings/tokens/new?scopes=user&description=Star%20Sorter%20for%20GitHub"
+const TOKEN_GUIDE_URL =
+  "https://github.com/Muhammad-waqar-uit/star-sorter/blob/main/docs/TOKEN_SETUP.md"
+const MANAGE_TOKENS_URL = "https://github.com/settings/tokens"
 
 type Props = {
   connected: boolean
@@ -70,8 +73,9 @@ export function TokenForm({ connected, login, onChanged }: Props) {
       <p className="mb-3 text-[11.5px] leading-relaxed text-muted">
         Star Sorter needs a <strong className="font-semibold text-ink">classic</strong> personal
         access token with the <code className="rounded bg-surface px-1 py-0.5 text-[11px]">user</code>{" "}
-        scope. It is stored only in this browser and only sent to api.github.com. Choose
-        whether to keep it or delete it after each apply run in Settings.
+        scope. Fine-grained tokens cannot manage Lists. It is stored only in this browser and
+        only sent to api.github.com. Choose whether to keep it or delete it after each apply run
+        in Settings.
       </p>
 
       {connected && !replacing && (
@@ -132,14 +136,64 @@ export function TokenForm({ connected, login, onChanged }: Props) {
               </button>
             )}
           </div>
-          <a
-            href={TOKEN_URL}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-2 inline-flex items-center gap-1 text-[11.5px] font-medium text-accent hover:underline">
-            Create a token with the right scope
-            <ExternalLink className="h-3 w-3" aria-hidden="true" />
-          </a>
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+            <a
+              href={TOKEN_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 text-[11.5px] font-medium text-accent hover:underline">
+              Open the pre-filled classic token form
+              <ExternalLink className="h-3 w-3" aria-hidden="true" />
+            </a>
+            <a
+              href={TOKEN_GUIDE_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 text-[11.5px] font-medium text-accent hover:underline">
+              Full setup guide
+              <ExternalLink className="h-3 w-3" aria-hidden="true" />
+            </a>
+            <a
+              href={MANAGE_TOKENS_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 text-[11.5px] font-medium text-accent hover:underline">
+              Manage tokens
+              <ExternalLink className="h-3 w-3" aria-hidden="true" />
+            </a>
+          </div>
+
+          <details className="mt-2 rounded-lg border border-line bg-surface/60 px-2.5 py-2">
+            <summary className="cursor-pointer text-[11px] font-medium text-accent">
+              How to create the token: settings and scopes
+            </summary>
+            <ol className="mt-2 list-decimal space-y-1 pl-4 text-[11px] leading-relaxed text-muted">
+              <li>
+                Open the link above. It opens GitHub's <strong>classic</strong> token form with
+                the <code>user</code> scope already selected. If you start from GitHub instead,
+                use <strong>Settings → Developer settings → Personal access tokens → Tokens
+                (classic) → Generate new token (classic)</strong>.
+              </li>
+              <li>
+                <strong>Note:</strong> <code>Star Sorter for GitHub</code>.{" "}
+                <strong>Expiration:</strong> 30, 60 or 90 days. Avoid no expiration.
+              </li>
+              <li>
+                <strong>Select scopes:</strong> tick <strong>only</strong>{" "}
+                <code>user</code>. Leave <code>repo</code>, <code>workflow</code>,{" "}
+                <code>admin:*</code> and <code>read:user</code> unchecked.{" "}
+                <code>read:user</code> is read-only and cannot create or update Lists.
+              </li>
+              <li>
+                Click <strong>Generate token</strong>, copy the <code>ghp_…</code> value (shown
+                once), paste it above, and press <strong>Save token</strong>.
+              </li>
+            </ol>
+            <p className="mt-2 text-[11px] leading-relaxed text-muted">
+              Fine-grained tokens are not supported for Lists. To rotate or revoke a token later,
+              use <strong>Manage tokens</strong> above, then <strong>Replace token</strong> here.
+            </p>
+          </details>
         </>
       )}
 

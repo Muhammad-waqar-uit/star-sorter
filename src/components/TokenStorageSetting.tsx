@@ -22,7 +22,7 @@ const options: {
     value: "delete-after-run",
     title: "Delete after each apply run",
     description:
-      "Removes the token and cached account when an apply run finishes — including cancelled or failed runs. You will need to paste it again for the next run or an undo."
+      "Removes the token and cached account when an apply run finishes — including cancelled or failed runs. Scans, list edits and undo do not delete it. You will need to paste it again for the next apply or an undo."
   }
 ]
 
