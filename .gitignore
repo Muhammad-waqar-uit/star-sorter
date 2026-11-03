@@ -28,3 +28,6 @@ Thumbs.db
 
 # Agent workspace
 .freebuff/
+
+# TypeScript incremental build info
+*.tsbuildinfo
