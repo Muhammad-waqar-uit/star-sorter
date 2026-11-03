@@ -6,6 +6,7 @@ import type {
   Account,
   RuleSet,
   RunState,
+  ScanProgress,
   ScanSummary,
   Settings,
   UndoLog
@@ -24,7 +25,8 @@ export const KEYS = {
   settings: "settings",
   lastScan: "lastScan",
   undoLog: "undoLog",
-  runState: "runState"
+  runState: "runState",
+  scanProgress: "scanProgress"
 } as const
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -89,6 +91,12 @@ export const getRunState = (): Promise<RunState | undefined> =>
   read<RunState>(KEYS.runState)
 export const setRunState = (state: RunState): Promise<void> =>
   write(KEYS.runState, state)
+
+export const getScanProgress = (): Promise<ScanProgress | undefined> =>
+  read<ScanProgress>(KEYS.scanProgress)
+export const setScanProgress = (progress: ScanProgress): Promise<void> =>
+  write(KEYS.scanProgress, progress)
+export const clearScanProgress = (): Promise<void> => remove(KEYS.scanProgress)
 
 /** Danger zone: remove everything this extension stored. */
 export async function clearAllData(): Promise<void> {

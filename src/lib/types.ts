@@ -140,6 +140,14 @@ export type ScanSummary = {
   login: string
 }
 
+export type ScanProgress = {
+  phase: "stars" | "lists"
+  stars: number
+  listsLoaded: number
+  listsTotal: number
+  at: number
+}
+
 export type Session = {
   connected: boolean
   account: Account | null

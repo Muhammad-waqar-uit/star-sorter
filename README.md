@@ -11,7 +11,7 @@
   <img alt="Plasmo" src="https://img.shields.io/badge/built%20with-Plasmo-6d7cf2.svg" />
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-strict-3178c6.svg" />
   <img alt="Manifest V3" src="https://img.shields.io/badge/manifest-v3-238636.svg" />
-  <img alt="Tests" src="https://img.shields.io/badge/tests-30%20passing-238636.svg" />
+  <img alt="Tests" src="https://img.shields.io/badge/tests-37%20passing-238636.svg" />
 </p>
 
 ---
@@ -33,8 +33,8 @@ GitHub Lists are the folders on your Stars page, but filing hundreds of reposito
 | **Stars page panel** | Floating _Sort stars_ button, only on `?tab=stars` / `/stars`, inside a shadow DOM so GitHub's CSS is untouched. |
 | **Token management** | Classic token with the `user` scope, validated against `viewer` before it is saved; remove or replace it any time. |
 | **Full scan** | Every starred repo (id, name, description, language, topics, stars, updated date, archived flag) plus every list and its members, 100 per page. |
-| **Editable rules** | JSON rule editor with validation, live per-list match counts, import, export and reset. Bundled defaults for 12 common categories. |
-| **Reviewable plan** | Grouped, filterable table with per-repo overrides, bulk assignment, skip, and a running count of the moves that will happen. |
+| **Editable rules** | Visual builder (add, rename, drag-reorder, delete, chip inputs) plus a JSON editor with validation, live per-list match counts, import, export and reset. Bundled defaults for 12 common categories. |
+| **Reviewable plan** | Grouped, searchable, virtualized table with per-repo overrides, bulk assignment, skip, live scan progress and a running count of the moves that will happen. |
 | **Safe apply** | Creates missing lists, merges the target with existing memberships, paces writes at 250 ms, retries transient failures and reports every failure. |
 | **Undo** | Restores the previous memberships of the last run and removes lists that run created when they are empty. |
 | **List management** | Create, rename, change privacy and delete lists, with the 32-list GitHub limit surfaced early. |
@@ -59,8 +59,9 @@ Load the development build:
 ### Production build
 
 ```bash
-pnpm build        # → build/chrome-mv3-prod
-pnpm package      # zip for the Chrome Web Store / Edge Add-ons
+pnpm build           # Chrome/Edge MV3 → build/chrome-mv3-prod
+pnpm build:firefox   # optional Firefox MV3 → build/firefox-mv3-prod
+pnpm package         # zip for the Chrome Web Store / Edge Add-ons
 ```
 
 > **Windows note:** Plasmo's bundler (Parcel) uses native modules that need the Microsoft Visual C++ Redistributable (x64). If `pnpm build` fails with `ERR_DLOPEN_FAILED ... .node`, install the [latest VC++ redistributable](https://aka.ms/vs/17/release/vc_redist.x64.exe) once and rerun the build.
@@ -90,6 +91,7 @@ GitHub Stars page
 ```
 
 - All GitHub requests and the token stay in the background worker, out of page context and page CSP.
+- The preview renders only the visible rows (windowing), so 5,000 stars stay responsive.
 - The rules engine and planning/merge logic are pure TypeScript in `src/lib`, unit tested with Vitest.
 - `updateUserListsForItem` replaces the complete membership set, so the worker always merges the target list with the repo's current lists.
 - Progress is written to storage and polled by the panel, so closing and reopening the panel reconnects to a running apply.
@@ -103,14 +105,15 @@ src/
 ├── background/
 │   ├── index.ts             service worker entry
 │   ├── apply-runner.ts      list creation, sequential writes, undo
-│   └── messages/            validate-token · session · scan · apply · progress · cancel · undo · lists · clear-data
+│   └── messages/            validate-token · session · scan · scan-progress · apply · progress · cancel · undo · lists · clear-data
 ├── contents/
 │   └── stars-panel.tsx      Stars-page detection, floating button, shadow DOM
-├── components/              Panel, PlanTable, RulesEditor, ListManager, TokenForm, ProgressBar, SettingsTab
+├── components/              Panel, PlanTable, RulesEditor, VisualRulesEditor, ChipInput, ListManager, TokenForm, ProgressBar, SettingsTab
 ├── lib/
 │   ├── github.ts            GraphQL client, queries, retries, pagination
 │   ├── rules.ts             rule matching, classification, validation
 │   ├── plan.ts              preview plan, membership merge, summaries
+│   ├── virtual.ts           fixed-height row windowing for the plan table
 │   ├── defaults.ts          bundled rule set
 │   ├── history.ts           undo log
 │   ├── storage.ts           typed chrome.storage.local access
@@ -137,6 +140,7 @@ docs/                        architecture, features, limitations, plan, progress
 - [Plan](docs/PLAN.md) — milestones and remaining work
 - [Progress](docs/PROGRESS.md) — status snapshot and verification results
 - [Testing](docs/TESTING.md) — automated tests and the manual end-to-end checklist
+- [Store listing](docs/STORE_LISTING.md) — copy, permission justifications and the submission checklist
 - [Requirements](docs/REQUIREMENTS.pdf) — the original product and technical spec
 
 ## Contributing

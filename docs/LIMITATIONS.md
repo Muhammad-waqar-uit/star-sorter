@@ -4,8 +4,6 @@ Known gaps in v1.0, in rough order of importance.
 
 ## Functional
 
-- **No visual drag-and-drop rule builder.** Rules are edited as JSON with validation, live
-  counts, import/export and reset. Reordering is done by moving array entries.
 - **No native per-repo “Move to list” menu** on GitHub's Stars page (spec F10). Deferred to
   v1.1 because it depends on GitHub's DOM and can break without notice.
 - **No score-based classification.** First match wins; a repo has one suggestion unless
@@ -18,9 +16,8 @@ Known gaps in v1.0, in rough order of importance.
 
 ## Performance
 
-- The preview table is memoized but **not virtualized**. A few thousand rows work, but 5,000+
-  rows will be noticeably heavier than a virtual list (spec NFR2). Grouping/filtering reduces
-  the rendered set in practice.
+- The preview uses fixed-height row windowing. Very long descriptions are truncated by CSS, so
+  rows keep a predictable height; there is no expandable row view.
 - The scan is sequential per list (one items request per page). For an account with 32 large
   lists this is more requests than strictly necessary; results are cached for the session.
 - Progress is polled every 700 ms while a run is active; writes to `chrome.storage.local`
@@ -33,8 +30,9 @@ Known gaps in v1.0, in rough order of importance.
   worker in extreme cases; the run state is persisted, but the remaining repos would not be
   processed and the UI would show a stale `running` state until the 10-minute stale-run guard
   allows a new run.
-- **Firefox is untested.** Plasmo can target Firefox, but only Chrome/Edge MV3 has been built
-  in this repository.
+- **Firefox runtime is untested.** `pnpm build:firefox` produces an MV3 package (background
+  event page), but only Chrome/Edge has been exercised in a browser. Firefox may require an
+  extension ID (`browser_specific_settings.gecko.id`) before permanent installation.
 - **Windows build prerequisite.** Parcel (used by Plasmo) loads native modules that require
   the Microsoft Visual C++ Redistributable (x64). Without it, `pnpm build` fails with
   `ERR_DLOPEN_FAILED ... .node`. Install the official redistributable and retry. This is a

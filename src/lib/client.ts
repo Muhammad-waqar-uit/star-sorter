@@ -7,6 +7,7 @@ import type {
   GitHubList,
   MessageResponse,
   RunState,
+  ScanProgress,
   ScanResult,
   Session
 } from "./types"
@@ -51,6 +52,8 @@ export const saveToken = (token: string) =>
 export const removeToken = () => call<{ cleared: true }>("validate-token", { clear: true })
 
 export const scanStars = () => call<ScanResult>("scan")
+
+export const getScanProgress = () => call<ScanProgress | null>("scan-progress")
 
 export const applyPlan = (items: ApplyItem[]) =>
   call<{ runId: string; total: number }>("apply", { items })

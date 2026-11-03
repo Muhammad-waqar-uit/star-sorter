@@ -21,6 +21,8 @@
   "scripts": {
     "dev": "plasmo dev",
     "build": "plasmo build",
+    "build:firefox": "plasmo build --target=firefox-mv3",
+    "dev:firefox": "plasmo dev --target=firefox-mv3",
     "package": "plasmo package",
     "test": "vitest run",
     "test:watch": "vitest",

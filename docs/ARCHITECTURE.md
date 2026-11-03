@@ -10,7 +10,9 @@ go wrong is previewable and reversible.
 | Component | Path | Responsibility |
 | --- | --- | --- |
 | Content script UI | `src/contents/stars-panel.tsx` | Detects Stars pages (including Turbo navigation), renders the floating button and panel inside a shadow DOM, follows GitHub's light/dark mode. |
-| Panel | `src/components/Panel.tsx` | Owns scan/plan/override state, polls run progress, orchestrates the tabs. |
+| Panel | `src/components/Panel.tsx` | Owns scan/plan/override state, polls scan and run progress, orchestrates the tabs. |
+| Plan table | `src/components/PlanTable.tsx` + `src/lib/virtual.ts` | Filters, groups and windows the preview so only visible rows are rendered. |
+| Rule editors | `src/components/RulesEditor.tsx`, `VisualRulesEditor.tsx`, `ChipInput.tsx` | Visual builder and JSON editor over one validated draft. |
 | Background worker | `src/background/index.ts` | Service-worker entry; initializes defaults. Owns the token, all GitHub calls and long-running applies. |
 | Message handlers | `src/background/messages/*.ts` | One operation per file, registered by Plasmo for `@plasmohq/messaging`. |
 | Apply runner | `src/background/apply-runner.ts` | Creates missing lists, merges memberships, paces writes, records the undo log, restores it on undo. |
@@ -25,7 +27,7 @@ go wrong is previewable and reversible.
 1. The panel sends `scan` to the worker.
 2. The worker reads the token from `chrome.storage.local` and calls `viewer` to resolve the login.
 3. It pages `starredRepositories(first: 100)` until `hasNextPage` is false, then pages each
-   list's `items` connection.
+   list's `items` connection, writing a `scanProgress` counter after every page.
 4. A normalized `ScanResult` goes back to the panel. Stars and lists are kept **in memory**
    only; a worker restart loses them, and the UI simply rescans.
 
@@ -70,6 +72,7 @@ can render actionable messages.
 | `validate-token` | `{ token }` or `{ clear: true }` | `{ account, login }` / `{ cleared }` |
 | `session` | — | `{ connected, account, lastScan, undoAvailable }` |
 | `scan` | — | `{ at, account, stars, lists }` |
+| `scan-progress` | — | `ScanProgress \| null` |
 | `apply` | `{ items: [{ repoId, nameWithOwner, targetList }] }` | `{ runId, total }` |
 | `progress` | — | `RunState \| null` |
 | `cancel` | — | `{ cancelling: true }` |
@@ -90,6 +93,7 @@ Everything is `chrome.storage.local`:
 | `lastScan` | `{ at, starCount, listCount, login }` | Popup summary only; star data is never persisted. |
 | `undoLog` | `{ at, previous, createdListIds, names }` | Single most recent run. |
 | `runState` | `RunState` | Progress and failures, also used for reconnect. |
+| `scanProgress` | `{ phase, stars, listsLoaded, listsTotal, at }` | Live scan counter; removed when the scan ends. |
 
 ## GitHub API use
 
@@ -120,3 +124,4 @@ Everything is `chrome.storage.local`:
 | JSON rules editor first | Exposes the full rule surface (ordering, owners, excludes) with validation and no drag-and-drop bugs. |
 | Cancellation in memory | A worker restart ends the run anyway; a persisted flag would only block the next attempt. |
 | Case-insensitive list matching | Avoids duplicate lists with different casing. |
+| Fixed-height row windowing | Renders ~20 rows instead of 5,000 without adding a dependency; row heights are known constants. |

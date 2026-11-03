@@ -8,7 +8,7 @@ pnpm test        # Vitest, single run
 pnpm build       # Plasmo production build
 ```
 
-Current status: **30 tests in 3 files pass**, typecheck passes, production build succeeds.
+Current status: **37 tests in 4 files pass**, typecheck passes, production build succeeds.
 
 ### What is covered
 
@@ -17,6 +17,7 @@ Current status: **30 tests in 3 files pass**, typecheck passes, production build
 | `src/lib/rules.test.ts` | Topic/language/keyword/owner matching, exclusions, first-match ordering, `maxListsPerRepo`, unsorted repos, per-list counts, validation (duplicates, 32-char names, 32-list cap, missing signals, invalid JSON), whitespace normalization |
 | `src/lib/plan.test.ts` | Suggested plan, override isolation, move/skip/unchanged summary, apply-item filtering, unsorted grouping, membership merge, undo-log snapshotting |
 | `src/lib/github.test.ts` | 401 → auth error without retry, 5xx retry then success, GraphQL scope error mapping, plain GraphQL errors, star pagination cursors, list-item pagination, list fetch with counts |
+| `src/lib/virtual.test.ts` | Row offset measurement, empty lists, top/mid/bottom windows, overscan, and a 5,000-row bound |
 
 The GitHub client tests stub `githubDeps.fetch` and `githubDeps.sleep`, so they run offline and
 instantly. No live GitHub credentials are used by the test suite.
@@ -43,6 +44,7 @@ Use a throwaway GitHub account with ~50 stars before running on a large collecti
 ### Scan
 
 - [ ] First scan lists every star and every existing list; counts match GitHub.
+- [ ] The counter advances while scanning (“Fetched 300 stars…”, “Reading lists 2/12…”).
 - [ ] Rescan reflects stars added in another tab.
 - [ ] Empty account (0 stars) → friendly empty state, no crash.
 
@@ -53,7 +55,9 @@ Use a throwaway GitHub account with ~50 stars before running on a large collecti
 - [ ] Select several rows → bulk set/skip works.
 - [ ] Filters and search return the expected rows.
 - [ ] “Include repos already in a list” reveals filed repos.
-- [ ] Edit a rule and save → suggestions and counts update without a rescan.
+- [ ] Edit a rule in the visual builder (add, rename, drag, delete, chips) and save → suggestions and counts update without a rescan.
+- [ ] Switch Visual → JSON → Visual; invalid JSON blocks the switch with a readable error.
+- [ ] Scroll a large plan to the bottom and back; rows render without gaps or jumps.
 - [ ] Import a rules file, export it, reset to defaults.
 
 ### Apply

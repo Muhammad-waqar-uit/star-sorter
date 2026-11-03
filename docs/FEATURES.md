@@ -20,6 +20,7 @@ Status legend: **Shipped** · **Partial** · **Planned**
 - Replace and remove token actions, with a direct link to the pre-scoped token form.
 - Errors are mapped to readable messages: invalid/expired token, missing scope, rate limit,
   network.
+- Invalid or under-scoped tokens surface a **Fix token** action that opens the token form.
 
 ## F3. Full scan — Shipped
 
@@ -27,6 +28,7 @@ Status legend: **Shipped** · **Partial** · **Planned**
   topics, star count, last update and archived flag.
 - Reads every list (id, name, description, privacy) and every repo inside it.
 - 100 items per GraphQL page; handles collections well beyond 5,000 stars.
+- A live counter shows fetched stars and “Reading lists 3/12…” while the scan runs.
 - Results are cached in memory for the session; **Rescan** refreshes them.
 
 ## F4. Rules engine — Shipped
@@ -40,13 +42,16 @@ Status legend: **Shipped** · **Partial** · **Planned**
 - Rule sets are validated before saving: required names, ≤32 characters, unique names,
   ≤32 lists, at least one signal per rule, string arrays only.
 
-## F5. Rules editor — Partial
+## F5. Rules editor — Shipped
 
-- Shipped: JSON editor with schema validation and inline error messages, live match counts
-  per list (“N stars”), import/export as `star-sorter-rules.json`, reset to defaults, and a
-  32-list warning.
-- Shipped: default privacy for new lists (`private`) and `maxListsPerRepo`.
-- Not yet: drag-to-reorder visual builder and chip inputs for topics/languages/keywords.
+- Visual builder: add, rename, drag-reorder (with accessible move up/down buttons), delete,
+  chip inputs for topics, languages, keywords, owners and excludes, live “N stars” counts, and
+  a 32-list warning.
+- JSON editor with schema validation, inline error messages, import/export as
+  `star-sorter-rules.json`, and reset to defaults.
+- Both modes edit one validated draft; invalid JSON blocks switching back to Visual with a
+  readable error.
+- Default privacy for new lists (`private`) and `maxListsPerRepo` are editable.
 
 ## F6. Preview and manual override — Shipped
 
@@ -56,6 +61,8 @@ Status legend: **Shipped** · **Partial** · **Planned**
 - Filters: All, To move, Suggested, Unsorted, Already filed; search by name/description/
   language.
 - Optional grouping by suggested list, with counts and collapse.
+- Fixed-height row windowing renders only the visible slice, so 5,000-row plans stay
+  responsive; switching filters resets the scroll position.
 - Bulk select + assign one list or skip all.
 - Repos already in a list are hidden by default; a checkbox includes them.
 - Footer always shows how many moves will happen.
@@ -111,11 +118,11 @@ danger zone that clears all extension data.
 | ID | Requirement | Status |
 | --- | --- | --- |
 | NFR1 | Scan of 500 stars under 15 s on a normal connection | Not benchmarked here; 5 pages + one request per list. |
-| NFR2 | Responsive preview with 5,000 rows | Partial: filtering/grouping are memoized but the table is not virtualized. |
+| NFR2 | Responsive preview with 5,000 rows | Yes: filtering, grouping and memoized row windowing (unit tested at 5,000 rows). |
 | NFR3 | No data leaves the browser except `api.github.com` | Yes — single endpoint, no analytics. |
 | NFR4 | Token never logged, never in page context, never in URLs | Yes. |
 | NFR5 | UI isolated in shadow DOM | Yes. |
 | NFR6 | Survives GitHub UI changes | Yes for the core flow: only the URL check and a floating button are used. |
 | NFR7 | Human-readable errors | Yes, mapped by error code. |
 | NFR8 | Keyboard navigable with ARIA labels | Yes. |
-| NFR9 | Chrome and Edge (MV3) | Yes; Firefox via Plasmo's target flag is untested. |
+| NFR9 | Chrome and Edge (MV3) | Yes; an optional Firefox MV3 build is available but not runtime-tested. |

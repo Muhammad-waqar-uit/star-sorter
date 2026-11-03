@@ -34,12 +34,13 @@ Milestones follow the original specification. Status reflects the repository as 
 - Retry with exponential backoff and `retry-after` awareness.
 - 32-list pre-flight check.
 
-## M4 — Management (done, except visual builder)
+## M4 — Management (done)
 
 - Lists tab: create, rename, privacy toggle, delete, counts.
 - JSON rules editor with per-list match counts, import/export and reset.
-- Visual rule builder (drag to reorder, chip inputs) — **remaining**.
-- Per-repo native menu (F10) — **remaining, v1.1**.
+- Visual rule builder: add, rename, drag reorder, delete, chip inputs for every signal.
+- Virtualized preview table for large collections.
+- Per-repo native menu (F10) — **remaining, v1.1 stretch**.
 
 ## M5 — Polish (done)
 
@@ -52,14 +53,13 @@ Milestones follow the original specification. Status reflects the repository as 
 
 - Store listing copy, screenshots and privacy policy: privacy policy drafted
   ([PRIVACY.md](PRIVACY.md)); screenshots and submission **remaining**.
-- Firefox build: optional, **not started**.
+- Firefox build: `pnpm build:firefox` produces a valid MV3 package; runtime smoke test **remaining**.
 - CI: typecheck, tests and production build on every push.
 
 ## Next up
 
-1. Virtualize the plan table for 5,000+ rows (NFR2).
-2. Visual rule builder on top of the existing validation and counts.
-3. Manual end-to-end run against a throwaway account with ~50 stars: scan → apply → undo,
+1. Manual end-to-end run against a throwaway account with ~50 stars: scan → apply → undo,
    cancel mid-run, expired token, offline, both themes, SPA navigation.
-4. Optional Firefox target and store submissions.
-5. Score-based suggestions and an “Archive” list for archived/stale repos (spec §12).
+2. Optional Firefox target and store submissions (copy is ready in STORE_LISTING.md).
+3. Native per-repo “Move to list” menu (F10, v1.1 stretch).
+4. Score-based suggestions and an “Archive” list for archived/stale repos (spec §12).

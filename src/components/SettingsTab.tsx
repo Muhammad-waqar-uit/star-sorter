@@ -1,7 +1,8 @@
 import { useState } from "react"
 
-import { clearAllData, removeToken, SorterError } from "../lib/client"
+import { clearAllData, SorterError } from "../lib/client"
 import type { Session, Settings } from "../lib/types"
+import { TokenForm } from "./TokenForm"
 
 type Props = {
   session: Session | null
@@ -16,20 +17,6 @@ export function SettingsTab({ session, settings, onSettings, onChanged }: Props)
 
   const update = async (patch: Partial<Settings>) => {
     await onSettings({ ...settings, ...patch })
-  }
-
-  const handleDisconnect = async () => {
-    setBusy("token")
-    setMessage(null)
-    try {
-      await removeToken()
-      await onChanged()
-      setMessage("Token removed.")
-    } catch (error) {
-      setMessage(error instanceof SorterError ? error.message : String(error))
-    } finally {
-      setBusy(null)
-    }
   }
 
   const handleClear = async () => {
@@ -51,16 +38,13 @@ export function SettingsTab({ session, settings, onSettings, onChanged }: Props)
 
   return (
     <div>
-      <div className="ss-row">
-        <button
-          className="ss-btn"
-          type="button"
-          onClick={() => chrome.runtime.openOptionsPage()}>
-          Open full options
-        </button>
-      </div>
+      <TokenForm
+        connected={Boolean(session?.connected)}
+        login={session?.account?.login}
+        onChanged={onChanged}
+      />
 
-      <h3 style={{ marginTop: 12 }}>Appearance</h3>
+      <h3 style={{ marginTop: 16 }}>Appearance</h3>
       <div className="ss-row">
         <label className="ss-hint" htmlFor="ss-theme">
           Theme
@@ -85,19 +69,9 @@ export function SettingsTab({ session, settings, onSettings, onChanged }: Props)
         Show repos that are already in a list after scanning
       </label>
 
-      <h3 style={{ marginTop: 16 }}>Account</h3>
-      <p className="ss-hint">
-        {session?.connected
-          ? `Connected as ${session.account?.login ?? "your account"}.`
-          : "No token stored."}
-      </p>
-      <div className="ss-row">
-        <button
-          className="ss-btn danger"
-          type="button"
-          onClick={() => void handleDisconnect()}
-          disabled={!session?.connected || busy !== null}>
-          Remove token
+      <div className="ss-row" style={{ marginTop: 16 }}>
+        <button className="ss-btn" type="button" onClick={() => chrome.runtime.openOptionsPage()}>
+          Open full options
         </button>
         <button
           className="ss-btn danger"

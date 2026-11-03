@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 
 import { groupPlan, isRepoInList, normalizeListName } from "../lib/plan"
 import type { GitHubList, PlanItem, PlanSummary } from "../lib/types"
+import { measureRows, visibleRange } from "../lib/virtual"
 
 type Filter = "all" | "moves" | "suggested" | "unsorted" | "already"
 
@@ -19,6 +20,15 @@ type Props = {
 const SKIP = "__skip__"
 const NEW = "__new__"
 
+const ITEM_HEIGHT = 50
+const GROUP_HEIGHT = 38
+const VIEWPORT_HEIGHT = 420
+const OVERSCAN = 4
+
+type RenderRow =
+  | { kind: "group"; key: string; name: string; count: number; collapsed: boolean }
+  | { kind: "item"; key: string; item: PlanItem }
+
 export function PlanTable({
   items,
   lists,
@@ -35,6 +45,8 @@ export function PlanTable({
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [bulkTarget, setBulkTarget] = useState("")
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
+  const [scrollTop, setScrollTop] = useState(0)
+  const scroller = useRef<HTMLDivElement>(null)
 
   const options = useMemo(() => {
     const map = new Map<string, string>()
@@ -85,6 +97,47 @@ export function PlanTable({
   }, [preFiltered, filter, search, lists])
 
   const groups = useMemo(() => groupPlan(visible), [visible])
+
+  const rows: RenderRow[] = useMemo(() => {
+    if (!grouped) {
+      return visible.map((item) => ({ kind: "item" as const, key: item.repoId, item }))
+    }
+
+    const next: RenderRow[] = []
+    for (const group of groups) {
+      const isCollapsed = collapsed.has(group.name)
+      next.push({
+        kind: "group",
+        key: `group:${group.name}`,
+        name: group.name,
+        count: group.items.length,
+        collapsed: isCollapsed
+      })
+      if (!isCollapsed) {
+        for (const item of group.items) {
+          next.push({ kind: "item", key: item.repoId, item })
+        }
+      }
+    }
+    return next
+  }, [grouped, groups, visible, collapsed])
+
+  const heights = useMemo(
+    () => rows.map((row) => (row.kind === "group" ? GROUP_HEIGHT : ITEM_HEIGHT)),
+    [rows]
+  )
+  const metrics = useMemo(() => measureRows(heights), [heights])
+  const range = useMemo(
+    () => visibleRange(metrics.offsets, heights, scrollTop, VIEWPORT_HEIGHT, OVERSCAN),
+    [metrics, heights, scrollTop]
+  )
+
+  // A new filter starts at the top, otherwise the window can point past the end.
+  useEffect(() => {
+    setScrollTop(0)
+    scroller.current?.scrollTo({ top: 0 })
+  }, [filter, search, grouped, includeSorted, collapsed])
+
   const allSelected = visible.length > 0 && visible.every((item) => selected.has(item.repoId))
 
   const toggleSelected = (repoId: string) => {
@@ -100,6 +153,15 @@ export function PlanTable({
     setSelected(allSelected ? new Set() : new Set(visible.map((item) => item.repoId)))
   }
 
+  const toggleGroup = (name: string) => {
+    setCollapsed((current) => {
+      const next = new Set(current)
+      if (next.has(name)) next.delete(name)
+      else next.add(name)
+      return next
+    })
+  }
+
   const applyBulk = (target: string | null) => {
     if (selected.size === 0) return
     onSetMany([...selected], target)
@@ -108,7 +170,7 @@ export function PlanTable({
   }
 
   const renderRow = (item: PlanItem) => (
-    <div className="ss-tr" key={item.repoId}>
+    <div className="ss-tr">
       <input
         type="checkbox"
         checked={selected.has(item.repoId)}
@@ -121,9 +183,7 @@ export function PlanTable({
         </a>
         <small title={item.description}>{item.description || "No description"}</small>
       </div>
-      <div className="ss-lang" title={item.description}>
-        {item.topics.slice(0, 3).join(" · ") || "—"}
-      </div>
+      <div className="ss-lang">{item.topics.slice(0, 3).join(" · ") || "—"}</div>
       <div className="ss-lang">{item.language || "—"}</div>
       <select
         aria-label={`Target list for ${item.nameWithOwner}`}
@@ -147,6 +207,8 @@ export function PlanTable({
       </select>
     </div>
   )
+
+  const viewport = Math.min(VIEWPORT_HEIGHT, metrics.totalHeight)
 
   return (
     <div>
@@ -235,34 +297,42 @@ export function PlanTable({
             <span>Target list</span>
           </div>
 
-          {grouped ? (
-            groups.map((group) => {
-              const isCollapsed = collapsed.has(group.name)
-              return (
-                <div key={group.name}>
-                  <button
-                    type="button"
-                    className="ss-group"
-                    aria-expanded={!isCollapsed}
-                    onClick={() =>
-                      setCollapsed((current) => {
-                        const next = new Set(current)
-                        if (next.has(group.name)) next.delete(group.name)
-                        else next.add(group.name)
-                        return next
-                      })
-                    }>
-                    <span aria-hidden>{isCollapsed ? "▸" : "▾"}</span>
-                    <span>{group.name}</span>
-                    <span className="count">{group.items.length}</span>
-                  </button>
-                  {!isCollapsed && group.items.map(renderRow)}
-                </div>
-              )
-            })
-          ) : (
-            visible.map(renderRow)
-          )}
+          <div
+            className="ss-vscroll"
+            ref={scroller}
+            style={{ height: viewport }}
+            onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}>
+            <div style={{ height: metrics.totalHeight, position: "relative" }}>
+              {rows.slice(range.start, range.end + 1).map((row, index) => {
+                const absoluteIndex = range.start + index
+                const top = metrics.offsets[absoluteIndex] ?? 0
+
+                return (
+                  <div
+                    key={row.key}
+                    className="ss-vrow"
+                    style={{
+                      transform: `translateY(${top}px)`,
+                      height: row.kind === "group" ? GROUP_HEIGHT : ITEM_HEIGHT
+                    }}>
+                    {row.kind === "group" ? (
+                      <button
+                        type="button"
+                        className="ss-group"
+                        aria-expanded={!row.collapsed}
+                        onClick={() => toggleGroup(row.name)}>
+                        <span aria-hidden>{row.collapsed ? "▸" : "▾"}</span>
+                        <span>{row.name}</span>
+                        <span className="count">{row.count}</span>
+                      </button>
+                    ) : (
+                      renderRow(row.item)
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
         </div>
       )}
 

@@ -6,6 +6,7 @@ import {
   applyPlan,
   cancelRun,
   getProgress,
+  getScanProgress,
   getSession,
   scanStars,
   SorterError,
@@ -44,7 +45,11 @@ type Props = {
   onClose: () => void
 }
 
-type Notice = { kind: "info" | "error" | "success" | "warn"; text: string }
+type Notice = {
+  kind: "info" | "error" | "success" | "warn"
+  text: string
+  fixToken?: boolean
+}
 
 export function Panel({ theme, onClose }: Props) {
   const [tab, setTab] = useState<Tab>("sort")
@@ -58,6 +63,7 @@ export function Panel({ theme, onClose }: Props) {
   const [busy, setBusy] = useState<string | null>(null)
   const [notice, setNotice] = useState<Notice | null>(null)
   const [run, setRun] = useState<RunState | null>(null)
+  const [scanNote, setScanNote] = useState<string | null>(null)
 
   const refreshSession = useCallback(async () => {
     try {
@@ -120,6 +126,40 @@ export function Panel({ theme, onClose }: Props) {
     }
   }, [run?.status, refreshSession])
 
+  // Live scan counter, polled while the worker pages through stars and lists.
+  useEffect(() => {
+    if (busy !== "scan") {
+      setScanNote(null)
+      return
+    }
+
+    let stopped = false
+    const tick = async () => {
+      try {
+        const progress = await getScanProgress()
+        if (stopped || !progress) return
+
+        setScanNote(
+          progress.phase === "stars"
+            ? `Fetched ${progress.stars} stars…`
+            : progress.listsTotal > 0
+              ? `Reading lists ${progress.listsLoaded}/${progress.listsTotal}…`
+              : `Loaded ${progress.stars} stars, reading lists…`
+        )
+      } catch {
+        // Progress is best effort; the scan itself reports the real result.
+      }
+    }
+
+    void tick()
+    const timer = window.setInterval(() => void tick(), 500)
+
+    return () => {
+      stopped = true
+      window.clearInterval(timer)
+    }
+  }, [busy])
+
   const plan: PlanItem[] = useMemo(
     () => (stars ? applyOverrides(buildPlan(stars, rules, lists), overrides) : []),
     [stars, rules, lists, overrides]
@@ -134,6 +174,7 @@ export function Panel({ theme, onClose }: Props) {
 
   const handleScan = async () => {
     setBusy("scan")
+    setScanNote(null)
     setNotice({ kind: "info", text: "Scanning your stars and lists…" })
     try {
       const result: ScanResult = await scanStars()
@@ -148,7 +189,9 @@ export function Panel({ theme, onClose }: Props) {
     } catch (error) {
       setNotice({
         kind: "error",
-        text: error instanceof SorterError ? error.message : String(error)
+        text: error instanceof SorterError ? error.message : String(error),
+        fixToken:
+          error instanceof SorterError && (error.code === "auth" || error.code === "scope")
       })
     } finally {
       setBusy(null)
@@ -180,7 +223,9 @@ export function Panel({ theme, onClose }: Props) {
     } catch (error) {
       setNotice({
         kind: "error",
-        text: error instanceof SorterError ? error.message : String(error)
+        text: error instanceof SorterError ? error.message : String(error),
+        fixToken:
+          error instanceof SorterError && (error.code === "auth" || error.code === "scope")
       })
     } finally {
       setBusy(null)
@@ -300,7 +345,18 @@ export function Panel({ theme, onClose }: Props) {
           />
         ) : tab === "sort" ? (
           <>
-            {notice && <div className={`ss-alert ${notice.kind}`}>{notice.text}</div>}
+            {notice && (
+              <div className={`ss-alert ${notice.kind}`}>
+                {busy === "scan" ? (scanNote ?? notice.text) : notice.text}
+                {notice.fixToken && (
+                  <div className="ss-row" style={{ marginTop: 6, marginBottom: 0 }}>
+                    <button className="ss-btn" type="button" onClick={() => setTab("settings")}>
+                      Fix token
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
             {!stars ? (
               <div className="ss-empty">

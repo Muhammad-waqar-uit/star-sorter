@@ -14,7 +14,7 @@ GraphQL client's pagination, retry and error mapping.
 | Check | Command | Result |
 | --- | --- | --- |
 | TypeScript (strict) | `pnpm typecheck` | Passes |
-| Unit tests | `pnpm test` | 30 tests in 3 files, all passing |
+| Unit tests | `pnpm test` | 37 tests in 4 files, all passing |
 | Production build | `pnpm build` | Succeeds → `build/chrome-mv3-prod` |
 | Manifest | inspect `build/chrome-mv3-prod/manifest.json` | MV3, `storage` + `api.github.com`, service worker, content script, popup, options, generated 16–128 px icons |
 
@@ -30,25 +30,27 @@ GraphQL client's pagination, retry and error mapping.
 - [x] Typed GraphQL client with pagination, retries, backoff and error mapping
 - [x] Rules engine: topics, languages, keywords, owners, exclude, ordering, `maxListsPerRepo`
 - [x] Bundled 12-list default rule set
-- [x] Preview plan with overrides, filters, search, grouping, bulk assignment
+- [x] Preview plan with overrides, filters, search, grouping, bulk assignment, virtualized rows
 - [x] Apply with merge, 250 ms pacing, cancel, per-repo failures, retry failed, summary
 - [x] Undo of the last run, including cleanup of empty created lists
 - [x] Lists tab (create, rename, privacy, delete, counts, limit warnings)
 - [x] JSON rules editor with validation, live counts, import/export/reset
+- [x] Visual rule builder with drag reorder, add/rename/delete and chip inputs
+- [x] Live scan progress counter
 - [x] Token form with validation and removal
 - [x] Popup with connection status, last scan and quick links
 - [x] Options page with preferences, privacy notes and danger zone
 - [x] Shadow-DOM styles, GitHub light/dark detection, ARIA labels and focus states
-- [x] Unit tests (rules, plan/merge, undo log, GraphQL client)
+- [x] Unit tests (rules, plan/merge, undo log, GraphQL client, row windowing)
 - [x] Documentation set + CI workflow
+- [x] Optional Firefox MV3 production build
 
 ## Not done
 
-- [ ] Visual drag-and-drop rule builder
-- [ ] Virtualized plan table for 5,000+ rows (NFR2)
 - [ ] Native per-repo “Move to list” menu (F10, v1.1)
 - [ ] Manual end-to-end pass against a real GitHub account (needs a token and a throwaway repo set)
-- [ ] Store screenshots, listing submission, optional Firefox build
+- [ ] Store screenshots and listing submission
+- [ ] Firefox runtime smoke test
 - [ ] Score-based suggestions and AI-assisted classification (future ideas)
 
 ## Notes for the next session

@@ -207,10 +207,13 @@ export async function executeRun(runId: string, items: ApplyItem[]): Promise<Run
       )
     }
 
+    const moved = Math.max(0, state.completed - state.failed.length - state.skipped)
+    const created = state.createdLists.length
+    const summary = `${moved} moved · ${created} list${created === 1 ? "" : "s"} created · ${state.failed.length} failed · ${state.skipped} skipped.`
     const message =
       state.failed.length > 0
-        ? `${state.completed} processed, ${state.failed.length} failed. Retry the failed rows or use Undo.`
-        : `${state.completed} repo${state.completed === 1 ? "" : "s"} filed, ${state.createdLists.length} list${state.createdLists.length === 1 ? "" : "s"} created.`
+        ? `${summary} Retry the failed rows or use Undo.`
+        : summary
 
     return finish(state, "done", message)
   } catch (error) {
