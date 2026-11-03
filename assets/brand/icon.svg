@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="512" height="512" role="img" aria-label="Star Sorter">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#F5F7FF"/><stop offset="1" stop-color="#DCEBFF"/>
+  </linearGradient>
+  <linearGradient id="back" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#C7D2FE"/><stop offset="1" stop-color="#A5B4FC"/>
+  </linearGradient>
+  <linearGradient id="front" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#8B9CFA"/><stop offset="1" stop-color="#6D7CF2"/>
+  </linearGradient>
+  <linearGradient id="star" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFF3B0"/><stop offset="1" stop-color="#FFD966"/>
+  </linearGradient>
+</defs>
+  <rect x="6" y="6" width="116" height="116" rx="30" fill="url(#bg)"/>
+  <rect x="6.75" y="6.75" width="114.5" height="114.5" rx="29.25" fill="none" stroke="#C7D7FE" stroke-width="1.5"/>
+  <path d="M28 46a9 9 0 0 1 9-9h18.5a9 9 0 0 1 7.2 3.6l3.1 4.1H91a9 9 0 0 1 9 9V52H28z" fill="url(#back)"/>
+  <rect x="28" y="50" width="72" height="46" rx="11" fill="url(#front)"/>
+  <path d="M64.00,58.00 L68.47,68.85 L80.17,69.75 L71.23,77.35 L73.99,88.75 L64.00,82.60 L54.01,88.75 L56.77,77.35 L47.83,69.75 L59.53,68.85Z" fill="url(#star)" stroke="url(#star)" stroke-width="4" stroke-linejoin="round"/>
+</svg>

@@ -1,0 +1,52 @@
+{
+  "name": "star-sorter",
+  "displayName": "Star Sorter for GitHub",
+  "version": "1.0.0",
+  "description": "Organize your GitHub stars into GitHub Lists automatically, with an editable preview, rule management and undo.",
+  "author": "Muhammad Waqar",
+  "license": "MIT",
+  "homepage": "https://github.com/Muhammad-waqar-uit/star-sorter#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Muhammad-waqar-uit/star-sorter.git"
+  },
+  "keywords": [
+    "github",
+    "stars",
+    "github-lists",
+    "chrome-extension",
+    "plasmo",
+    "productivity"
+  ],
+  "scripts": {
+    "dev": "plasmo dev",
+    "build": "plasmo build",
+    "package": "plasmo package",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@plasmohq/messaging": "^0.7.2",
+    "@plasmohq/storage": "^1.15.0",
+    "plasmo": "^0.90.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.287",
+    "@types/node": "^22.10.2",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^3.2.4"
+  },
+  "manifest": {
+    "permissions": [
+      "storage"
+    ],
+    "host_permissions": [
+      "https://api.github.com/*"
+    ]
+  }
+}

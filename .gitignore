@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+.plasmo/
+build/
+out/
+dist/
+/*.zip
+
+# Local tooling / environment
+.native/
+.env
+.env.*
+!.env.example
+coverage/
+*.log
+
+# Local reference material that should not be published
+reference/screenshots/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Agent workspace
+.freebuff/
