@@ -17,8 +17,8 @@ dist/
 coverage/
 *.log
 
-# Local reference material that should not be published
-reference/screenshots/
+# Local reference material (prototype zips, screenshots) — never published
+reference/
 
 # OS / editor
 .DS_Store
