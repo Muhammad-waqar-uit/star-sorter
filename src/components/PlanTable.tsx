@@ -187,27 +187,34 @@ export function PlanTable({
       </div>
       <div className="ss-lang">{item.topics.slice(0, 3).join(" · ") || "—"}</div>
       <div className="ss-lang">{item.language || "—"}</div>
-      <select
-        className="ss-select ss-select-sm"
-        aria-label={`Target list for ${item.nameWithOwner}`}
-        value={item.target ?? SKIP}
-        onChange={(event) => {
-          const value = event.target.value
-          if (value === NEW) {
-            const name = window.prompt("New list name (max 32 characters)")
-            if (name?.trim()) onSetTarget(item.repoId, name.trim())
-            return
-          }
-          onSetTarget(item.repoId, value === SKIP ? null : value)
-        }}>
-        <option value={SKIP}>Skip</option>
-        {options.map((name) => (
-          <option key={name} value={name}>
-            {name}
-          </option>
-        ))}
-        <option value={NEW}>+ New list…</option>
-      </select>
+      <div className="min-w-0">
+        <select
+          className="ss-select ss-select-sm"
+          aria-label={`Target list for ${item.nameWithOwner}`}
+          value={item.target ?? SKIP}
+          onChange={(event) => {
+            const value = event.target.value
+            if (value === NEW) {
+              const name = window.prompt("New list name (max 32 characters)")
+              if (name?.trim()) onSetTarget(item.repoId, name.trim())
+              return
+            }
+            onSetTarget(item.repoId, value === SKIP ? null : value)
+          }}>
+          <option value={SKIP}>Skip</option>
+          {options.map((name) => (
+            <option key={name} value={name}>
+              {name}
+            </option>
+          ))}
+          <option value={NEW}>+ New list…</option>
+        </select>
+        <span
+          className="mt-0.5 block truncate text-[9.5px] leading-tight text-muted"
+          title={`Suggested: ${item.suggested ?? "Unsorted"}`}>
+          Suggested: {item.suggested ?? "Unsorted"}
+        </span>
+      </div>
     </div>
   )
 

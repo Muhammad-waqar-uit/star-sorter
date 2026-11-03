@@ -18,6 +18,7 @@ function Popup() {
 
   const login = session?.account?.login
   const lastScan = session?.lastScan
+  const lastRun = session?.lastRun
 
   return (
     <div className="ss-page ss-popup">
@@ -55,6 +56,18 @@ function Popup() {
             <span>Last scan</span>
             <span className="truncate text-[11px]">
               {lastScan ? new Date(lastScan.at).toLocaleString() : "Never"}
+            </span>
+          </div>
+          <div className="ss-kv">
+            <span>Last run</span>
+            <span
+              className="max-w-[168px] truncate text-[10.5px]"
+              title={lastRun?.message || undefined}>
+              {lastRun
+                ? lastRun.status === "running"
+                  ? "In progress…"
+                  : lastRun.message || `${lastRun.completed} / ${lastRun.total} processed`
+                : "—"}
             </span>
           </div>
           <div className="ss-kv">

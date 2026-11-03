@@ -56,7 +56,7 @@ Releases are published automatically by the [Release workflow](.github/workflows
 | **Reviewable plan** | Grouped, searchable, virtualized table with per-repo overrides, bulk assignment, skip, live scan progress and a running count of the moves that will happen. |
 | **Safe apply** | Creates missing lists, merges the target with existing memberships, paces writes at 250 ms, retries transient failures and reports every failure. |
 | **Undo** | Restores the previous memberships of the last run and removes lists that run created when they are empty. |
-| **List management** | Create, rename, change privacy and delete lists, with the 32-list GitHub limit surfaced early. |
+| **List management** | Create lists with descriptions, rename, edit descriptions, change privacy and delete, with the 32-list GitHub limit surfaced early. |
 | **Popup & options** | Status at a glance, full-size rule editing, preferences, privacy notes and a data-reset zone. |
 | **Polished UI** | Tailwind CSS design tokens, a GitHub-matching light/dark theme, Lucide icons and focus-visible states, all isolated in a shadow root. |
 

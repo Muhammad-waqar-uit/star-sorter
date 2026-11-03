@@ -148,10 +148,21 @@ export type ScanProgress = {
   at: number
 }
 
+export type LastRunSummary = {
+  status: RunStatus
+  message: string
+  completed: number
+  total: number
+  skipped: number
+  failed: number
+  at: number
+}
+
 export type Session = {
   connected: boolean
   account: Account | null
   lastScan: ScanSummary | null
+  lastRun: LastRunSummary | null
   undoAvailable: boolean
 }
 

@@ -1,6 +1,6 @@
 # Progress
 
-Snapshot: **2026-11-03** · v1.0.0
+Snapshot: **2026-11-03**
 
 ## Summary
 
@@ -36,12 +36,12 @@ error mapping, and a GitHub Actions workflow builds and publishes tagged release
 - [x] Preview plan with overrides, filters, search, grouping, bulk assignment, virtualized rows
 - [x] Apply with merge, 250 ms pacing, cancel, per-repo failures, retry failed, summary
 - [x] Undo of the last run, including cleanup of empty created lists
-- [x] Lists tab (create, rename, privacy, delete, counts, limit warnings)
+- [x] Lists tab (create with description, rename, edit description, privacy, delete, counts, limit warnings)
 - [x] JSON rules editor with validation, live counts, import/export/reset
 - [x] Visual rule builder with drag reorder, add/rename/delete and chip inputs
 - [x] Live scan progress counter
 - [x] Token form with validation and removal
-- [x] Popup with connection status, last scan and quick links
+- [x] Popup with connection status, last scan, last run result and quick links
 - [x] Options page with preferences, privacy notes and danger zone
 - [x] Tailwind CSS design tokens, component layer and per-icon Lucide imports
 - [x] Shadow-DOM styles, GitHub light/dark detection, ARIA labels and focus states

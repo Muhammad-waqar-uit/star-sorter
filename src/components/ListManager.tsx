@@ -1,5 +1,6 @@
 import {
   AlertTriangle,
+  FileText,
   Folder,
   FolderOpen,
   Globe,
@@ -20,11 +21,12 @@ type Props = {
   onChanged: (lists: GitHubList[]) => void
 }
 
-/** Create, rename, change privacy and delete GitHub Lists. */
+/** Create, rename, edit the description, change privacy and delete GitHub Lists. */
 export function ListManager({ lists, onChanged }: Props) {
   const [busy, setBusy] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [name, setName] = useState("")
+  const [description, setDescription] = useState("")
   const [isPrivate, setIsPrivate] = useState(false)
 
   const refresh = useCallback(async () => {
@@ -61,8 +63,14 @@ export function ListManager({ lists, onChanged }: Props) {
   const create = () =>
     run("create", async () => {
       if (!name.trim()) throw new Error("Enter a list name.")
-      const result = await listAction({ action: "create", name: name.trim(), isPrivate })
+      const result = await listAction({
+        action: "create",
+        name: name.trim(),
+        description: description.trim() || undefined,
+        isPrivate
+      })
       setName("")
+      setDescription("")
       return result
     })
 
@@ -70,6 +78,17 @@ export function ListManager({ lists, onChanged }: Props) {
     const next = window.prompt("List name", list.name)
     if (!next?.trim() || next.trim() === list.name) return
     void run(list.id, () => listAction({ action: "update", listId: list.id, name: next.trim() }))
+  }
+
+  const editDescription = (list: GitHubList) => {
+    const next = window.prompt(
+      `Description for “${list.name}” (leave blank to clear)`,
+      list.description || ""
+    )
+    if (next === null || next.trim() === (list.description || "")) return
+    void run(list.id, () =>
+      listAction({ action: "update", listId: list.id, description: next.trim() })
+    )
   }
 
   const togglePrivacy = (list: GitHubList) =>
@@ -163,6 +182,15 @@ export function ListManager({ lists, onChanged }: Props) {
               <button
                 className="ss-btn ss-btn-icon ss-btn-ghost"
                 type="button"
+                title="Edit description"
+                aria-label={`Edit description for ${list.name}`}
+                disabled={busy !== null}
+                onClick={() => editDescription(list)}>
+                <FileText className="h-3.5 w-3.5" aria-hidden="true" />
+              </button>
+              <button
+                className="ss-btn ss-btn-icon ss-btn-ghost"
+                type="button"
                 title={list.isPrivate ? "Make public" : "Make private"}
                 aria-label={`Make ${list.name} ${list.isPrivate ? "public" : "private"}`}
                 disabled={busy !== null}
@@ -198,6 +226,13 @@ export function ListManager({ lists, onChanged }: Props) {
           onKeyDown={(event) => {
             if (event.key === "Enter" && name.trim()) void create()
           }}
+        />
+        <input
+          className="ss-input w-full"
+          value={description}
+          placeholder="Description (optional)"
+          aria-label="New list description"
+          onChange={(event) => setDescription(event.target.value)}
         />
         <label className="ss-check">
           <input

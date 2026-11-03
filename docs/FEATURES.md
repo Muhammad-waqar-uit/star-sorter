@@ -55,8 +55,8 @@ Status legend: **Shipped** · **Partial** · **Planned**
 
 ## F6. Preview and manual override — Shipped
 
-- Table of every repo that will be considered: link, description, topics, language, target
-  list and a per-row dropdown.
+- Table of every repo that will be considered: link, description, topics, language, the
+  suggested list, target list and a per-row dropdown.
 - Dropdown contains existing lists, rule lists, **Skip** and **+ New list…**.
 - Filters: All, To move, Suggested, Unsorted, Already filed; search by name/description/
   language.
@@ -88,7 +88,8 @@ Status legend: **Shipped** · **Partial** · **Planned**
 ## F9. List management — Shipped
 
 - Lists tab with repo counts and privacy badges.
-- Create, rename, toggle private/public and delete (with confirmation).
+- Create with an optional description, rename, edit the description, toggle private/public
+  and delete (with confirmation).
 - Warns when approaching GitHub's 32-list limit.
 
 ## F10. Native per-repo “Move to list” menu — Planned (v1.1)
@@ -98,8 +99,8 @@ the core flow. The floating panel requires no DOM anchors.
 
 ## F11. Popup — Shipped
 
-Token/connection status, last scan counts and time, undo availability, and quick links to
-your Stars page and Options.
+Token/connection status, last scan counts and time, the last run result (moved, created,
+failed, skipped), undo availability, and quick links to your Stars page and Options.
 
 ## F12. Options page — Shipped
 

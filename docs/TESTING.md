@@ -84,8 +84,10 @@ Use a throwaway GitHub account with ~50 stars before running on a large collecti
 
 ### Lists
 
-- [ ] Create, rename, toggle privacy and delete a list; counts update.
+- [ ] Create a list with a description, rename it, edit its description, toggle privacy and
+      delete it; counts update.
 - [ ] Creating a 33rd list is blocked with a clear message.
+- [ ] The popup shows the last run result and the undo state after a run.
 
 ### Themes and accessibility
 
